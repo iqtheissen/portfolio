@@ -162,6 +162,7 @@ export default function ProjectList({
           return (
             <React.Fragment key={project.name}>
               <div
+                className="cursor-target"
                 onClick={() => onSelect?.(project)}
                 onMouseEnter={() => {
                   if (!isSelected) onHover?.(project.name);

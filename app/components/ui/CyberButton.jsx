@@ -16,7 +16,7 @@ export default function CyberButton({
 
   return (
     <button
-      className="cyber-btn relative w-[200px] h-[60px] group overflow-visible
+      className="cursor-target cyber-btn relative w-[200px] h-[60px] group overflow-visible
                  bg-[#000304] hover:bg-[#010F15] transition-colors duration-300
                  will-change-[background-color]"
       onClick={onClick}

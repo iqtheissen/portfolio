@@ -6,45 +6,38 @@ import SectionHeader from '../ui/SectionHeader';
 export default function AboutSection({ progress, isMobile, scrollY }) {
   const experiences = [
     {
-      title: 'Software Engineer',
-      company: 'PixelForge Labs',
-      period: 'May 2022 – Present',
-      location: 'Remote',
+      title: 'MBO Software Developer',
+      company: 'MBO Utrecht',
+      period: 'Aug 2019 – June 2022',
+      location: 'Utrecht, Netherlands',
       description:
-        'Developed backend services and APIs using Node.js and PostgreSQL. Integrated third-party services and built scalable RESTful endpoints for mobile apps. Contributed to DevOps pipelines and CI/CD workflows.',
+        "Completed a vocational program in Software Development, gaining a foundation in front-end, PHP-based back-end development, and game development. Built practical projects in web and game applications, collaborating in agile team environments and applying version control and modern programming practices.",
     },
     {
-      title: 'Design Intern',
-      company: 'BrightFrame Studio',
-      period: 'Jun 2021 – Aug 2021',
-      location: 'San Francisco, CA',
+      title: 'Software Development Intern',
+      company: 'AXiS Digitaal',
+      period: 'Aug 2022 – May 2023',
+      location: 'Nieuwegein, Netherlands',
       description:
-        'Supported senior designers in developing high-fidelity prototypes. Participated in branding workshops and usability testing sessions for client projects across fintech and healthcare industries.',
+        "Worked on Unity game development using C# and WordPress-based web projects. Assisted in managing partner relationships and conducted client interviews to gather requirements. Collaborated with the development team to deliver practical solutions and gain hands-on experience in both software and client-facing processes.",
     },
     {
-      title: 'Mobile App Developer',
-      company: 'LumenTech',
-      period: 'Jan 2021 – Apr 2022',
-      location: 'Austin, TX',
+      title: 'Junior Software Developer',
+      company: 'AXiS Digitaal',
+      period: 'May 2023 – Dec 2023',
+      location: 'Nieuwegein, Netherlands',
       description:
-        'Built cross-platform mobile apps using React Native. Focused on performance optimization and offline-first features. Implemented biometric authentication and integrated cloud sync.',
+        "Designed a website for the gaming brand AXiS Gameforce and created a GUI for a data entry application. Oversaw a team of interns on WordPress projects and took on increased responsibility in project management. Developed an educational web-based game for children, working closely with international clients to meet their needs.",
     },
     {
-      title: 'Computer Science Teaching Assistant',
-      company: 'University of Aurora',
-      period: 'Sep 2020 – May 2021',
-      location: 'Aurora, CO',
+      title: 'AD Software Developer',
+      company: 'Hogeschool Utrecht',
+      period: 'Aug 2024 – Current',
+      location: 'Amersfoort, Netherlands',
       description:
-        'Assisted in teaching Data Structures and Algorithms courses. Led weekly labs, graded assignments, and mentored students during office hours. Helped design practical programming exercises.',
-    },
-    {
-      title: 'Full Stack Bootcamp Graduate',
-      company: 'CodeCrush Academy',
-      period: 'Mar 2020 – Aug 2020',
-      location: 'Online',
-      description:
-        'Completed an intensive coding bootcamp focused on MERN stack. Built several full-stack applications and collaborated with teams on agile development cycles. Capstone project: a real-time chat app.',
-    },
+        "Collaborated in an agile team environment with fellow students, developing multiple applications across Java and C#. Projects included a CLI application for managing patient data, a JavaFX public transport app for assisting people with autism, a C# public transport dashboard for a real client, and a flashcard game for learning programming terms. Gained hands-on experience in project management, teamwork, and delivering functional software solutions.",
+    }
+
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);

@@ -2,6 +2,7 @@ import { Anaheim } from "next/font/google";
 import { Anybody } from "next/font/google";
 import "./globals.css";
 
+
 const anaheim = Anaheim({
   weight: "400",
   subsets: ["latin"],
@@ -22,7 +23,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      
       <body className={anybody.className}>
+        
         {children}
       </body>
     </html>

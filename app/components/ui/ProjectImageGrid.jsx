@@ -1,5 +1,6 @@
 import React from 'react';
 import IconButton from './IconButton'; // Adjust path if necessary
+import TiltedCard from '@/app/blocks/Components/TiltedCard/TiltedCard';
 
 export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab.com/users/sign_in" }) {
   const { main, small1, small2 } = images || {};
@@ -15,6 +16,7 @@ export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab
     >
       {/* Main 16:9 image with GitHub button */}
       <div
+        className='cursor-target'
         style={{
           position: 'relative',
           width: '100%',
@@ -25,10 +27,17 @@ export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab
         }}
       >
         {main && (
-          <img
-            src={main}
-            alt="Main project"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          <TiltedCard
+            imageSrc={main}
+            altText="Main project"
+            containerWidth="100%"
+            containerHeight="100%"
+            imageWidth="100%"
+            imageHeight="100%"
+            showMobileWarning={false}
+            showTooltip={false}
+            scaleOnHover={1.05}
+            rotateAmplitude={7}
           />
         )}
 
@@ -61,6 +70,7 @@ export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab
         {[small1, small2].map((src, idx) => (
           <div
             key={idx}
+            className='cursor-target'
             style={{
               width: '100%',
               aspectRatio: '1 / 1',
@@ -70,10 +80,17 @@ export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab
             }}
           >
             {src && (
-              <img
-                src={src}
-                alt={`Project thumb ${idx + 1}`}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              <TiltedCard
+                imageSrc={src}
+                altText={`Project thumb ${idx + 1}`}
+                containerWidth="100%"
+                containerHeight="100%"
+                imageWidth="100%"
+                imageHeight="100%"
+                showMobileWarning={false}
+                showTooltip={false}
+                scaleOnHover={1.05}
+                rotateAmplitude={7}
               />
             )}
           </div>

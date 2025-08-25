@@ -124,6 +124,7 @@ export default function HeroSection({ startAnimation, isMobile }) {
         </div>
 
         <div
+          
           style={{
             fontSize: isMobile ? "3.8rem" : "6.5rem",
             fontWeight: 600,

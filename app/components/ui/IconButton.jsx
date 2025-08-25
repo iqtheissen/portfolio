@@ -3,7 +3,8 @@ import React from "react";
 export default function IconButton({ icon, tag = "", onClick }) {
   return (
     <button
-      className="icon-btn relative w-[60px] h-[60px] group overflow-visible
+      
+      className="cursor-target icon-btn relative w-[60px] h-[60px] group overflow-visible
                  bg-[#000304] hover:bg-[#010F15] transition-colors duration-300
                  will-change-[background-color] flex items-center justify-center"
       onClick={onClick}

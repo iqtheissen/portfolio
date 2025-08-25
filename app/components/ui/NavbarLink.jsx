@@ -27,7 +27,7 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
       onClick={handleClick}
       onMouseEnter={startAnimation}
       onMouseLeave={resetText}
-      className="text-white font-medium tracking-wider transition-colors duration-300 hover:text-white-400"
+      className="cursor-target text-white font-medium tracking-wider transition-colors duration-300 hover:text-white-400"
       style={{
         display: "grid",
         placeItems: "center",

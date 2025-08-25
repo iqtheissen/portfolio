@@ -13,6 +13,7 @@ import useThrottle from "./hooks/useThrottle";
 import ThreeScene from "./components/background/ThreeScene";
 import AboutSection from "./components/sections/AboutSection";
 import useMediaQuery from "./hooks/useMediaQuery"; // ✅ default import
+import TargetCursor from "./blocks/Animations/TargetCursor";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -126,6 +127,7 @@ export default function Home() {
 
   return (
     <>
+      <TargetCursor spinDuration={10} hideDefaultCursor={true} />
       {showLoading && (
         <div
           style={{

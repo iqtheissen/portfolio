@@ -212,6 +212,7 @@ vBlurPass.uniforms.v.value = blurStrength / window.innerHeight;
 
   return (
     <canvas
+      className="cursor-target"
       ref={canvasRef}
       style={{
         width: "100%",
