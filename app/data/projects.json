@@ -1,0 +1,42 @@
+[
+    {
+      "name": "habitica",
+      "title": "Quest Generator",
+      "description": "A tool to generate Habitica-compatible quest content.",
+      "tags": ["game", "habitica", "automation"],
+      "year": 2022,
+      "status": "Completed",
+      "projectLink": "https://habitica.com",
+      "githubLink": "https://github.com/yourname/habitica-generator"
+    },
+    {
+      "name": "phunics",
+      "title": "Phunics Word Game",
+      "description": "A fun phonics-based word game for learners.",
+      "tags": ["education", "game", "phonics"],
+      "year": 2023,
+      "status": "In Progress",
+      "projectLink": "https://phunics.io",
+      "githubLink": "https://github.com/yourname/phunics"
+    },
+    {
+      "name": "gamma",
+      "title": "Gamma Gateway",
+      "description": "A custom dashboard to manage gamma ray telescope data.",
+      "tags": ["dashboard", "science", "data"],
+      "year": 2021,
+      "status": "Completed",
+      "projectLink": "https://gamma.app",
+      "githubLink": "https://github.com/yourname/gamma"
+    },
+    {
+      "name": "delta",
+      "title": "Delta Dashboard",
+      "description": "Business dashboard for visualizing real-time KPIs.",
+      "tags": ["dashboard", "business", "analytics"],
+      "year": 2024,
+      "status": "Beta",
+      "projectLink": "https://delta.io",
+      "githubLink": "https://github.com/yourname/delta"
+    }
+  ]

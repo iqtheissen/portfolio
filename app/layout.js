@@ -1,14 +1,17 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Anaheim } from "next/font/google";
+import { Anybody } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const anaheim = Anaheim({
+  weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const anybody = Anybody({
+  weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -19,9 +22,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={anybody.className}>
         {children}
       </body>
     </html>
