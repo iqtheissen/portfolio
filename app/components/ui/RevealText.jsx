@@ -5,7 +5,7 @@ export default function RevealText({
   progress = 0,
   start = 0,
   end = 1,
-  startColor = '#777',
+  startColor = '#222',
   endColor = '#fff',
 }) {
   const blurRange = 4;

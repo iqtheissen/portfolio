@@ -63,7 +63,7 @@ export default function SectionHeader({
           fontSize: '3rem',
         }
       : {
-          ...(fromLeft ? { left: '4vw' } : { right: '4vw' }),
+          ...(fromLeft ? { left: isMobile ? '4vw' : '12vw' } : { right: isMobile ? '4vw' : '10vw' }),
           transform: 'translateY(-50%)',
           textAlign: fromLeft ? 'left' : 'right',
           fontSize: '4rem',

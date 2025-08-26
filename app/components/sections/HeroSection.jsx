@@ -158,7 +158,7 @@ export default function HeroSection({ startAnimation, isMobile }) {
                 progress={i === activeIndex ? progress : 0}
                 fontSize={isMobile ? 3.8 * 16 : 6.5 * 16}
                 fontWeight={600}
-                strokeColor="#ff2d2d"
+                strokeColor="#f54b5c"
                 strokeWidth={1}
                 fillColor="transparent"
                 transitionSpeed={1.8}

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import ProjectCard from '../ui/ProjectCard';
 import RevealText from '../ui/RevealText';
 import SectionHeader from '../ui/SectionHeader';
+import RippleGrid from '@/app/blocks/Backgrounds/RippleGrid/RippleGrid';
 
 export default function AboutSection({ progress, isMobile, scrollY }) {
   const experiences = [
@@ -87,7 +88,7 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
         position: 'relative',
         width: '100%',
         height: isMobile ? 'auto' : '100vh',
-        padding: '0 4vw',
+        padding: isMobile ? '0 4vw' : '0 6vw',
         color: 'white',
         overflow: 'hidden',
         display: 'flex',
@@ -104,17 +105,19 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
         progress={progress}
         fromLeft={false}
         isMobile={isMobile}
+        
         >
       </SectionHeader>
         
       {/* Experience Cards */}
       <div
+      
         style={{
           flex: isMobile ? 'unset' : 1,
           width: isMobile ? '100%' : 'auto',
           height: isMobile ? '50vh' : '400px',
           maxWidth: isMobile ? '100%' : '35vw',
-          marginBottom : isMobile ? '18vh' : 0,
+          marginBottom : isMobile ? '40vh' : 0,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -129,6 +132,35 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
         onTouchMove={handleDragMove}
         onTouchEnd={handleDragEnd}
       >
+        {/* Ripple background positioned behind the cards and scaled larger */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: isMobile
+              ? 'translate(-50%, -50%) scale(1.6)'
+              : 'translate(-50%, -50%) scale(1.4)',
+            width: isMobile ? '160%' : '140%',
+            height: isMobile ? '160%' : '140%',
+            zIndex: 0,
+            pointerEvents: 'auto',
+            overflow: 'hidden',
+          }}
+          aria-hidden={true}
+        >
+          <RippleGrid
+            enableRainbow={false}
+            gridColor="#ffffff"
+            rippleIntensity={0.015}
+            gridSize={20}
+            gridThickness={30}
+            mouseInteraction={true}
+            mouseInteractionRadius={1.2}
+            opacity={0.6}
+          />
+        </div>
+              
         {experiences.map((exp, idx) => {
           const offset = idx - activeIndex;
           if (offset < -2 || offset > 2) return null;
@@ -147,7 +179,7 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
                 left: '50%',
                 top: '50%',
                 transform: `translateX(${translateX}px) translateY(-50%) scale(${scale})`,
-                width: isMobile ? '80vw' : '25vw',
+                width: isMobile ? '75vw' : '25vw',
                 height: isMobile ? '80%' : 'auto',
                 transform: `translate(calc(-50% + ${translateX}px), -50%) scale(${scale})`,
                 transition: 'transform 0.5s ease, opacity 0.5s ease',
@@ -241,8 +273,8 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
         style={{
           flex: isMobile ? 'unset' : 1,
           
-          maxWidth: isMobile ? '100%' : '70ch',
-          fontSize: '1rem',
+          maxWidth: isMobile ? '100%' : '30vw',
+          fontSize: isMobile ? '1rem' : '1.1rem',
           lineHeight: 1.7,
           textAlign: 'left',
           position: 'relative',
@@ -251,18 +283,23 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
           paddingLeft: isMobile ? '4vw' : 0,
           paddingRight: isMobile ? '4vw' : 0,
           marginLeft: 0,
+          marginRight: isMobile ? 0 : '3vw',
         }}
         data-scroll
         data-scroll-speed="2"
         data-scroll-direction="vertical"
       >
-        <RevealText progress={progress} start={0.3} end={1}>
-        <p>I’m a creative developer exploring interaction and animation.</p>
-        <p>
-          I specialize in frontend experiences and work with tools like <strong>React</strong> and{' '}
-          <em>Three.js</em>.
-        </p>
-</RevealText>
+        <RevealText progress={progress} start={0.3} end={1} >
+          <p style={{ marginBottom: isMobile ? '0.75rem' : '1rem' }}>
+            I am a passionate software developer with a solid foundation in front-end, PHP-based back-end development, and game development. Throughout my education at MBO Utrecht and hands-on experiences at AXiS Digitaal and Hogeschool Utrecht, I have gained practical expertise in building web, mobile, and desktop applications across a variety of technologies, including Java, C#, JavaFX, Unity, React Native, and WordPress.
+          </p>
+          <p style={{ marginBottom: isMobile ? '0.75rem' : '1rem' }}>
+            I thrive in collaborative, agile team environments, having led interns, worked directly with clients, and contributed to real-world projects ranging from educational games and public transport applications to dashboards and data management tools. My work blends technical skill with creativity, a keen eye for user experience, and a focus on delivering practical solutions that make an impact.
+          </p>
+          <p style={{ marginBottom: isMobile ? '0.75rem' : '1rem' }}>
+            Driven by curiosity and continuous learning, I enjoy tackling complex problems, exploring new technologies, and creating software that is both functional and engaging.
+          </p>
+        </RevealText>
 
       </div>
     </section>
