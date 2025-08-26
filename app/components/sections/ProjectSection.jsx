@@ -71,16 +71,25 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
   }, [hoveredProjectName, selectedProject]);
 
   useEffect(() => {
+    // keep existing behavior when not swapping
     if (!isSwapping) return;
 
-    const timeout = setTimeout(() => {
+    // Previously this used a fixed timeout. Now the overlay's ProjectDisplay
+    // will call `finalizeSwap` via onRevealComplete after its staggered
+    // animations (and the reveal animation) have finished. Nothing to do
+    // here — the finalizeSwap callback will handle completion.
+    return undefined;
+  }, [isSwapping, nextProject]);
+
+  const finalizeSwap = () => {
+    // called by the revealed ProjectDisplay once its internal animations finished
+    // add tiny pause so animations feel settled before the instantaneous swap
+    setTimeout(() => {
       setCurrentProject(nextProject);
       setNextProject(null);
       setIsSwapping(false);
-    }, 600);
-
-    return () => clearTimeout(timeout);
-  }, [isSwapping, nextProject]);
+    }, 100);
+  };
 
   useEffect(() => {
   if (isMobileOverlayOpen) {
@@ -142,6 +151,7 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
           }}
           isMobile={isMobile}
           isAnimating={isMobileOverlayOpen}
+          isDisabled={isSwapping}
         />
         
         { /* Project Mobile Modal */}
@@ -181,6 +191,9 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
                 width: '100%',
                 height: '100%',
                 zIndex: 1,
+                // fade the current project when hovering an unselected project
+                opacity: !isSwapping && hoveredProjectName && hoveredProjectName !== selectedProject.name ? 0.5 : 1,
+                transition: 'opacity 0.3s ease',
                 animation:
                   isSwapping
                     ? swapDirection === 'down'
@@ -191,6 +204,9 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
             >
               <ProjectDisplay
                 project={currentProject}
+                hoverDirection={hoverDirection}
+                onRevealComplete={() => { /* no-op for current (leaving) display */ }}
+                animateReveal={false}
               />
             </div>
             {isSwapping && nextProject && (
@@ -208,6 +224,9 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
               >
                 <ProjectDisplay
                  project={selectedProject}
+                 hoverDirection={hoverDirection}
+                  onRevealComplete={finalizeSwap}
+                  disableInteractions={true}
                 />
               </div>
             )}
@@ -251,6 +270,9 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
     <ProjectDisplay
       project={selectedProject}
       isMobile={isMobile}
+  hoverDirection={hoverDirection}
+                onRevealComplete={finalizeSwap}
+                disableInteractions={true}
     />
   </div>
 )}

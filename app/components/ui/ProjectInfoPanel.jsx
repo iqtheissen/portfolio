@@ -1,12 +1,66 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import TechTag from './TechTag';
 import CyberButton from './CyberButton';
 
 export default function ProjectInfoPanel({
   project,
+  hoverDirection = 'down',
+  onRevealComplete,
+  animateReveal = true,
 }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!animateReveal) {
+      if (onRevealComplete) onRevealComplete();
+      return undefined;
+    }
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const children = Array.from(el.querySelectorAll('[data-reveal]'));
+    if (children.length === 0) {
+      if (onRevealComplete) onRevealComplete();
+      return;
+    }
+
+    const order = hoverDirection === 'down' ? children : children.slice().reverse();
+
+    order.forEach((child, idx) => {
+      child.style.opacity = '0';
+      child.style.transform = hoverDirection === 'down' ? 'translateY(12px)' : 'translateY(-12px)';
+  child.style.animation = `revealItem 0.72s ease forwards`;
+  child.style.animationDelay = `${0.128 * idx}s`;
+    });
+
+    const last = order[order.length - 1];
+    let called = false;
+    const handler = (e) => {
+      if (called) return;
+      if (e.target !== last) return;
+      called = true;
+      if (onRevealComplete) onRevealComplete();
+    };
+
+    last.addEventListener('animationend', handler);
+
+  const fallback = setTimeout(() => {
+      if (!called) {
+        called = true;
+        if (onRevealComplete) onRevealComplete();
+      }
+  }, 1600);
+
+    return () => {
+      last.removeEventListener('animationend', handler);
+      clearTimeout(fallback);
+    };
+  }, [project && project.name, hoverDirection, onRevealComplete]);
+
   return (
     <div
+      ref={containerRef}
       style={{
         height: '100%',
         display: 'flex',
@@ -16,7 +70,7 @@ export default function ProjectInfoPanel({
       }}
     >
       {/* Title */}
-      <h1 style={{ margin: 0, textTransform: 'uppercase' }}>{project.title}</h1>
+      <h1 data-reveal style={{ margin: 0, textTransform: 'uppercase' }}>{project.title}</h1>
 
       {/* Tags */}
       <div
@@ -29,18 +83,20 @@ export default function ProjectInfoPanel({
         }}
       >
         {project.tags.map((tech, index) => (
-  <TechTag key={tech + index} text={tech} color="#61dafb" />
-))}
+          <div key={tech + index} data-reveal>
+            <TechTag text={tech} color="#61dafb" />
+          </div>
+        ))}
       </div>
 
       {/* Description */}
-      <div>
+      <div data-reveal>
         <strong style={{ display: 'block', marginBottom: '0.3rem' }}>Description</strong>
         <p style={{ marginTop: 0 }}>{project.description}</p>
       </div>
 
       {/* Year & Goal */}
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+      <div data-reveal style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: '150px' }}>
           <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Year</strong>
           <div>{project.year}</div>
@@ -52,13 +108,13 @@ export default function ProjectInfoPanel({
       </div>
 
       {/* Status */}
-      <div>
+      <div data-reveal>
         <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Status</strong>
         <div>{project.status}</div>
       </div>
 
       {/* View Project Button */}
-      <div style={{ marginTop: '2rem' }}>
+      <div data-reveal style={{ marginTop: '2rem' }}>
         <CyberButton
           href={project.url}
           style={{
@@ -71,7 +127,13 @@ export default function ProjectInfoPanel({
           view project
         </CyberButton>
       </div>
-      
+
+      <style jsx>{`
+        @keyframes revealItem {
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
     </div>
   );
 }

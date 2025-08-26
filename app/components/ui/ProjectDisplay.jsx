@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ProjectImageGrid from './ProjectImageGrid';
 import ProjectInfoPanel from './ProjectInfoPanel';
 
@@ -6,12 +6,39 @@ export default function ProjectDisplay({
   project,
   isMobile = false,
   onClose,
+  hoverDirection = 'down',
+  onRevealComplete,
+  animateReveal = true,
+  disableInteractions = false,
 }) {
   const images = {
     main: `/projects/${project.name}/main.png`,
     small1: `/projects/${project.name}/small1.png`,
     small2: `/projects/${project.name}/small2.png`,
   };
+
+  const [imagesDone, setImagesDone] = useState(false);
+  const [infoDone, setInfoDone] = useState(false);
+
+  useEffect(() => {
+    // reset when project changes
+    setImagesDone(false);
+    setInfoDone(false);
+  }, [project && project.name]);
+
+  // If this display should not animate (outgoing/current view), mark children done immediately
+  useEffect(() => {
+    if (!animateReveal) {
+      setImagesDone(true);
+      setInfoDone(true);
+    }
+  }, [animateReveal, project && project.name]);
+
+  useEffect(() => {
+    if (imagesDone && infoDone && typeof onRevealComplete === 'function') {
+      onRevealComplete();
+    }
+  }, [imagesDone, infoDone, onRevealComplete]);
 
   return (
     <div
@@ -25,6 +52,10 @@ export default function ProjectDisplay({
         marginTop: isMobile ? '4rem' : '0',
         position: 'relative',
         boxSizing: 'border-box',
+        // start transparent; children will animate in and call onRevealComplete
+        opacity: 1,
+  // disable pointer interactions for temporary/incoming displays when requested
+  pointerEvents: disableInteractions ? 'none' : undefined,
       }}
     >
       {/* Mobile Close Button */}
@@ -50,10 +81,10 @@ export default function ProjectDisplay({
       )}
 
       <div style={{ width: isMobile ? '100%' : '50%' }}>
-        <ProjectImageGrid images={images} />
+    <ProjectImageGrid images={images} hoverDirection={hoverDirection} onRevealComplete={() => setImagesDone(true)} animateReveal={animateReveal} disableInteractions={disableInteractions} />
       </div>
       <div style={{ width: isMobile ? '100%' : '50%' }}>
-        <ProjectInfoPanel project={project} />
+  <ProjectInfoPanel project={project} hoverDirection={hoverDirection} onRevealComplete={() => setInfoDone(true)} animateReveal={animateReveal} disableInteractions={disableInteractions} />
       </div>
     </div>
   );

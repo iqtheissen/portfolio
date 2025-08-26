@@ -1,4 +1,91 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useDecryptAnimation } from '../../hooks/useDecryptAnimation';
+
+function ProjectListItem({
+  project,
+  idx,
+  isSelected,
+  disabled,
+  isMobile,
+  animationStyles,
+  itemBaseStyle,
+  shouldDim,
+  onSelect,
+  onHover,
+  onHoverEnd,
+  dividerStyle,
+  hasDivider = false,
+  swapActive = false,
+}) {
+  // when selected -> uppercase (decryptedText), otherwise lowercase (originalText)
+  const original = project.title.toLowerCase();
+  const decrypted = project.title.toUpperCase();
+  const { displayText, startAnimation, resetText } = useDecryptAnimation({ originalText: original, decryptedText: decrypted, delay: 25 });
+
+  // track previous selection to trigger animations on selection change
+  const [wasSelected, setWasSelected] = useState(false);
+
+  useEffect(() => {
+    // on mount or when isSelected changes, run appropriate animation
+    // When an item becomes selected, animate to uppercase and keep it that way
+    if (isSelected) {
+      startAnimation();
+    } else {
+      // deselected -> ensure lowercase
+      resetText();
+    }
+    setWasSelected(isSelected);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSelected]);
+
+  // hover brightness for unselected items
+  const [isHover, setIsHover] = useState(false);
+
+  // clear hover state when selection changes to avoid stale hover color
+  useEffect(() => {
+    setIsHover(false);
+  }, [isSelected]);
+
+  return (
+    <React.Fragment>
+      <div
+        className={isSelected ? '' : (disabled ? '' : 'cursor-target')}
+        onClick={() => { if (!disabled && !isSelected) onSelect?.(project); }}
+        onMouseEnter={() => {
+          if (!disabled && !isSelected) {
+            setIsHover(true);
+            startAnimation(); // hover: temporary uppercase
+            onHover?.(project.name);
+          }
+        }}
+        onMouseLeave={() => {
+          if (!disabled && !isSelected) {
+            setIsHover(false);
+            resetText();
+            onHoverEnd?.();
+          }
+        }}
+        style={{
+          ...itemBaseStyle,
+          ...animationStyles,
+          opacity: shouldDim && !isSelected ? 0.25 : (animationStyles.opacity ?? 1),
+          cursor: isSelected ? 'default' : (disabled ? 'default' : itemBaseStyle.cursor),
+          pointerEvents: disabled ? 'none' : undefined,
+          transition: 'opacity 0.3s ease, transform 0.6s ease, filter 0.6s ease, color 0.15s ease',
+          color: isSelected ? itemBaseStyle.color : (isHover ? '#ddd' : itemBaseStyle.color),
+          textTransform: 'none', // controlled via decrypt animation
+        }}
+      >
+        {displayText}
+      </div>
+
+      {/* Divider between items (mobile only) */}
+      {hasDivider && (
+        <div style={dividerStyle} />
+      )}
+    </React.Fragment>
+  );
+}
 
 
 export default function ProjectList({
@@ -10,6 +97,7 @@ export default function ProjectList({
   isMobile = false,
   progress = 0,
   isAnimating = false,
+  isDisabled = false,
 }) {
   const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle' | 'forward' | 'reverse'
 
@@ -41,6 +129,26 @@ export default function ProjectList({
   const mobileMaxGap = 40; // px
   const mobileMinGap = 12; // px
   const mobileGap = mobileMinGap + (mobileMaxGap - mobileMinGap) * (1 - progress);
+  const listRef = useRef(null);
+  const itemRefs = useRef([]);
+  const [handleTop, setHandleTop] = useState(0);
+
+  useEffect(() => {
+    // update item refs array length
+    itemRefs.current = itemRefs.current.slice(0, projects.length);
+  }, [projects.length]);
+
+  useEffect(() => {
+    // position the handle to match the selected item
+    const selectedIndex = projects.findIndex(p => p.name === selectedProjectName);
+    const el = itemRefs.current[selectedIndex];
+    if (el && listRef.current) {
+      const listRect = listRef.current.getBoundingClientRect();
+      const itemRect = el.getBoundingClientRect();
+      const top = itemRect.top - listRect.top + itemRect.height / 2; // center of item
+      setHandleTop(top);
+    }
+  }, [selectedProjectName, projects, isDisabled]);
 
   return (
     <div
@@ -54,7 +162,7 @@ export default function ProjectList({
         justifyContent: isMobile ? 'center' : 'flex-start',
       }}
     >
-      <div
+  <div
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -67,7 +175,7 @@ export default function ProjectList({
           position: 'relative',
         }}
       >
-        {projects.map((project, idx) => {
+  {projects.map((project, idx) => {
           const isSelected = project.name === selectedProjectName;
 
           // Base styles
@@ -159,42 +267,69 @@ export default function ProjectList({
             margin: '0.5rem 0',
           };
 
-          return (
-            <React.Fragment key={project.name}>
-              <div
-                className="cursor-target"
-                onClick={() => onSelect?.(project)}
-                onMouseEnter={() => {
-                  if (!isSelected) onHover?.(project.name);
-                }}
-                onMouseLeave={() => onHoverEnd?.()}
-                style={{ ...itemBaseStyle, ...animationStyles }}
-              >
-                {project.title.toUpperCase()}
-              </div>
+          const disabled = isDisabled || animationPhase !== 'idle';
+          const shouldDim = !isMobile && isDisabled; // only dim on desktop while a project swap is playing
 
-              {/* Divider between items (mobile only) */}
-              {isMobile && idx < projects.length - 1 && (
-                <div style={dividerStyle} />
-              )}
-            </React.Fragment>
+          // Render a dedicated list item so we can use hooks per item
+          return (
+            <div key={project.name} ref={el => itemRefs.current[idx] = el} style={{ width: '100%' }}>
+              <ProjectListItem
+                project={project}
+                idx={idx}
+                isSelected={isSelected}
+                disabled={disabled}
+                isMobile={isMobile}
+                animationStyles={animationStyles}
+                itemBaseStyle={itemBaseStyle}
+                shouldDim={shouldDim}
+                onSelect={onSelect}
+                onHover={onHover}
+                onHoverEnd={onHoverEnd}
+                dividerStyle={dividerStyle}
+                hasDivider={isMobile && idx < projects.length - 1}
+                swapActive={isDisabled}
+              />
+            </div>
           );
         })}
       </div>
 
       {/* Vertical divider on desktop */}
       {!isMobile && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            right: 0,
-            width: '1px',
-            background:
-              'linear-gradient(to bottom, transparent 0%, white 50%, transparent 100%)',
-          }}
-        />
+        <>
+          <div
+            ref={listRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              // move slightly further right without affecting layout
+              right: '-20px',
+              width: '1px',
+              background:
+                'linear-gradient(to bottom, transparent 0%, white 50%, transparent 100%)',
+              opacity: isDisabled ? 0.5 : 1,
+              transition: 'opacity 0.3s ease',
+            }}
+          />
+          {/* scrollbar-like handle */}
+          <div
+            style={{
+              position: 'absolute',
+              // move the handle the same amount as the divider so it visually aligns
+              right: '-20px',
+              width: isDisabled ? '7px' : '10px',
+              borderRadius: '2px',
+              height: '36px',
+              background: 'white',
+              transform: 'translateX(50%)',
+              transition: 'top 0.3s cubic-bezier(0.2,0,0.2,1), width .2s cubic-bezier(0.2,0,0.2,1)',
+              top: handleTop ? `${handleTop - 18}px` : '0px',
+              
+              pointerEvents: 'none',
+            }}
+          />
+        </>
       )}
     </div>
   );
