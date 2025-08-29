@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import NavbarLink from "./NavbarLink";
 import MenuToggleButton from "./MenuToggleButton";
+import useSectionProgress from "../../hooks/useSectionProgress";
 
 export default function Navbar({
   locoScrollRef,
@@ -14,33 +15,33 @@ export default function Navbar({
   const [borderWidth, setBorderWidth] = useState("0%");
   const [transitionSpeed, setTransitionSpeed] = useState("1.5s");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const normalTransitionSpeed = "0.4s";
+  const [atTop, setAtTop] = useState(true);
+  const normalTransitionSpeed = "0.7s";
+
+  // Use ScrollTrigger-driven section progress to determine whether we're
+  // at the top of the page. When the active section is 'hero' and its
+  // progress is 0, we consider the page to be at the top and show the
+  // full-width underline; otherwise hide it.
+  const { activeSection, sectionProgress } = useSectionProgress(["hero", "about", "projects"]);
 
   useEffect(() => {
-    if (!isLocoReady || !locoScrollRef?.current) return;
+    const heroProgress = sectionProgress && sectionProgress.hero != null ? sectionProgress.hero : 0;
+  // Only consider "at top" when the hero section is active and its
+  // progress is near zero. Do NOT treat a null activeSection as at-top
+  // because null can represent intermediate states.
+  const isTop = heroProgress < 0.55;
+    setAtTop(isTop);
+    setBorderWidth(isTop ? "100%" : "0%");
+  }, [activeSection, sectionProgress]);
 
-    const locoScroll = locoScrollRef.current;
-    const updateBorderWidth = (scrollY) => {
-      setBorderWidth(scrollY === 0 ? "100%" : "0%");
-    };
-
-    updateBorderWidth(locoScroll.scroll?.y ?? 0);
-
-    const onScroll = (args) => {
-      updateBorderWidth(args.scroll?.y ?? 0);
-    };
-
-    locoScroll.on("scroll", onScroll);
-
+  // Keep the initial slow transition, then switch to normal speed after a
+  // short delay (matches previous behaviour).
+  useEffect(() => {
     const transitionTimeout = setTimeout(() => {
       setTransitionSpeed(normalTransitionSpeed);
     }, 1000);
-
-    return () => {
-      clearTimeout(transitionTimeout);
-      locoScroll.off("scroll", onScroll);
-    };
-  }, [isLocoReady, locoScrollRef]);
+    return () => clearTimeout(transitionTimeout);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -69,34 +70,41 @@ export default function Navbar({
           left: 0,
           right: 0,
           height: "60px",
-          background:
-            "linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent)",
+          
           color: "white",
           display: "flex",
           alignItems: "center",
           justifyContent: isMobile ? "space-between" : "flex-end",
-          padding: isMobile ? "0 1.5rem" : "2rem 14rem",
+          padding: isMobile ? "0 1.5rem" : `2rem ${atTop ? "18rem" : "12.5rem"}`,
+          transition: `padding ${transitionSpeed} ease`,
           zIndex: 1000,
         }}
       >
+        
         {isMobile && (
-          <div style={{ fontWeight: "bold", fontSize: "1.2rem" }}>MySite</div>
+          <div style={{ position: "relative", zIndex: 2, fontWeight: "bold", fontSize: "1.2rem" }}></div>
         )}
 
         {!isMobile && (
-          <div style={{ display: "flex", gap: "4rem" }}>
+          <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: atTop ? "2rem" : "0", transition: `gap ${transitionSpeed} ease` }}>
             <NavbarLink
               href="#about"
               originalText="about"
               decryptedText="ABOUT"
               locoScrollRef={locoScrollRef}
             />
+
+            <span aria-hidden style={{ color: "rgba(255,255,255,0.65)", opacity: atTop ? 0 : 0.65, transform: atTop ? "translateY(-4px) scale(0.9)" : "translateY(0) scale(1)", transition: `opacity 300ms ease, transform 300ms ease` }}>/</span>
+
             <NavbarLink
               href="#projects"
               originalText="projects"
               decryptedText="PROJECTS"
               locoScrollRef={locoScrollRef}
             />
+
+            <span aria-hidden style={{ color: "rgba(255,255,255,0.65)", opacity: atTop ? 0 : 0.65, transform: atTop ? "translateY(-4px) scale(0.9)" : "translateY(0) scale(1)", transition: `opacity 300ms ease, transform 300ms ease` }}>/</span>
+
             <NavbarLink
               href="#contact"
               originalText="contact"
@@ -108,7 +116,9 @@ export default function Navbar({
 
         {/* Mobile Menu Button */}
         {isMobile && (
-          <MenuToggleButton isOpen={isToggleOpen} onClick={handleToggleClick} />
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <MenuToggleButton isOpen={isToggleOpen} onClick={handleToggleClick} />
+          </div>
         )}
 
         {/* Desktop underline */}
@@ -124,6 +134,7 @@ export default function Navbar({
               background: "linear-gradient(to right, white, transparent)",
               pointerEvents: "none",
               transition: `width ${transitionSpeed} cubic-bezier(0.4, 0, 0.2, 1)`,
+              zIndex: 3,
             }}
           />
         )}

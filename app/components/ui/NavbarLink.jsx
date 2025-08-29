@@ -13,10 +13,15 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
   const handleClick = (e) => {
     e.preventDefault();
     if (locoScrollRef?.current) {
+      // Lenis expects `duration` in seconds and `easing` as a function.
+      // Convert previous easing to a reasonable easeOutCubic approximation.
+      const lenisDuration = 1.3; // seconds
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
       locoScrollRef.current.scrollTo(href, {
         offset: 0,
-        duration: 1000,
-        easing: [0.25, 0, 0.35, 1],
+        duration: lenisDuration,
+        easing: easeOutCubic,
       });
     }
   };
@@ -29,10 +34,11 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
       onMouseLeave={resetText}
       className="cursor-target text-white font-medium tracking-wider transition-colors duration-300 hover:text-white-400"
       style={{
+        fontSize: "1.2rem",
         display: "grid",
         placeItems: "center",
-        minWidth: "7rem",
-        height: "2rem",
+        minWidth: "6rem",
+        height: "1.4rem",
         overflow: "hidden",
         lineHeight: 1.2,
         whiteSpace: "nowrap",

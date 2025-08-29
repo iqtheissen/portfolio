@@ -78,8 +78,8 @@ export default function useSectionProgress(sectionIds = [], /* kept for compatib
       triggers.push(st);
     });
 
-    // Ensure ScrollTrigger measurements are correct
-    ScrollTrigger.refresh();
+  // Ensure ScrollTrigger measurements are correct
+  ScrollTrigger.refresh();
 
     // Flush interval: update React state from lastProgressRef at ~60ms
     intervalId = setInterval(() => {
@@ -98,6 +98,9 @@ export default function useSectionProgress(sectionIds = [], /* kept for compatib
     }, 30);
 
     return () => {
+      try {
+        if (typeof _cleanupScroll === "function") _cleanupScroll();
+      } catch (e) {}
       triggers.forEach((t) => {
         try {
           t.kill();

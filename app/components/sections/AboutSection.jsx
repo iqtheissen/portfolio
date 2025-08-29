@@ -274,7 +274,7 @@ export default function AboutSection({ progress, isMobile}) {
           flex: isMobile ? 'unset' : 1,
           
           maxWidth: isMobile ? '100%' : '30vw',
-          fontSize: isMobile ? '1rem' : '1.1rem',
+          fontSize: isMobile ? '1rem' : '1rem',
           lineHeight: 1.7,
           textAlign: 'left',
           position: 'relative',
