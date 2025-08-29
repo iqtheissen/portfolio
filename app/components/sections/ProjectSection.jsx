@@ -6,8 +6,15 @@ import projects from '../../data/projects.json';
 
 import SectionHeader from '../ui/SectionHeader';
 
-export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen, setIsMobileOverlayOpen}) {
-  const [selectedProject, setSelectedProject] = useState(projects[0]);
+export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen, setIsMobileOverlayOpen, selectedProject: parentSelectedProject, onProjectChange }) {
+  const [selectedProject, setSelectedProject] = useState(parentSelectedProject || projects[0]);
+
+  // Sync with parent-controlled selected project
+  useEffect(() => {
+    if (parentSelectedProject && parentSelectedProject.name !== selectedProject.name) {
+      setSelectedProject(parentSelectedProject);
+    }
+  }, [parentSelectedProject]);
   const [currentProject, setCurrentProject] = useState(projects[0]);
   const [nextProject, setNextProject] = useState(null);
   const [isSwapping, setIsSwapping] = useState(false);
@@ -25,7 +32,8 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
     const direction = nextIdx > currentIdx ? 'up' : 'down';
 
     setSwapDirection(direction);
-    setSelectedProject(project);
+  setSelectedProject(project);
+  if (typeof onProjectChange === 'function') onProjectChange(project);
     setNextProject(project);
     setIsSwapping(true);
 

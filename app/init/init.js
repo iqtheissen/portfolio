@@ -345,22 +345,22 @@ export const init = (canvasElement) => {
   camera.lookAt(0,0,0)
   scene.add(camera);
   window.addEventListener("resize", () => {
-    // Update
-    width = window.innerWidth;
-    height = window.innerHeight;
+  // Prefer the canvas size for aspect ratio (canvas may be smaller than window)
+  const w = canvas.clientWidth || window.innerWidth;
+  const h = canvas.clientHeight || window.innerHeight;
 
-    // Update camera
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+  // Update camera using canvas dimensions
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
 
-    // Update renderer
-    gl.setSize(width, height);
-    gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Update renderer - don't change the canvas CSS size here
+  gl.setSize(w, h, false);
+  gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   });
 
  
 
-  gl.setSize(width, height);
+  gl.setSize(width, height, false);
   gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   SmoothOrbitControls();

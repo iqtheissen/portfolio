@@ -12,7 +12,7 @@ import fragmentShader from "../../shaders/fragment";
 import { horizontalBlurShader } from "../../shaders/horizontalBlurShader";
 import { verticalBlurShader } from "../../shaders/verticalBlurShader";
 
-export default function ThreeScene({ onLoaded, progress = 0, activeSection }) {
+export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMobile}) {
   const canvasRef = useRef(null);
   const mousePos = useRef(new THREE.Vector2(0.5, 0.5));
 
@@ -81,29 +81,27 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection }) {
       composer.addPass(new SMAAPass(1, 1));
       composer.addPass(new ShaderPass(TransparentBackgroundShader));
 
-      let hasResized = false;
-
       const resize = () => {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
+        const width = Math.max(1, container.clientWidth);
+        const height = Math.max(1, container.clientHeight);
         const dpr = window.devicePixelRatio || 1;
-        const resolutionMultiplier = 2;
 
-        if (!hasResized) {
-          canvas.width = width * resolutionMultiplier;
-          canvas.height = height * resolutionMultiplier;
+        // Use devicePixelRatio for the drawing buffer to avoid clipping / low-res
+        const bufferW = Math.floor(width * dpr);
+        const bufferH = Math.floor(height * dpr);
 
-          torus.material.uniforms.uResolution.value.set(
-            width * resolutionMultiplier,
-            height * resolutionMultiplier
-          );
+        canvas.width = bufferW;
+        canvas.height = bufferH;
 
-          Main.gl.setPixelRatio(dpr);
-          Main.gl.setSize(width, height, false);
-          composer.setSize(width, height);
-          hasResized = true;
-        }
+        // Update shader uniform with buffer size
+        torus.material.uniforms.uResolution.value.set(bufferW, bufferH);
 
+        // Renderer and composer sizes: GL size uses CSS size + DPR; composer uses buffer size
+        Main.gl.setPixelRatio(dpr);
+        Main.gl.setSize(width, height, false);
+        composer.setSize(bufferW, bufferH);
+
+        // Keep the canvas CSS size equal to the container so layout is stable
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
 
@@ -182,8 +180,11 @@ vBlurPass.uniforms.v.value = blurStrength / window.innerHeight;
   const minDistance = 2;       // Closest camera distance
   const maxDistance = 2.6;      // Farthest camera distance
 
+  const minDistanceMobile = 10
+  const maxDistanceMobile = 20
+
   // Interpolate distance based on progress (0 to 1)
-  const newZ = minDistance + (maxDistance - minDistance) * (1 - progressRef.current);
+  const newZ = isMobile ? minDistanceMobile + (maxDistanceMobile - minDistanceMobile) * (1 - progressRef.current) : minDistance + (maxDistance - minDistance) * (1 - progressRef.current);
   Main.camera.position.z = newZ;
   Main.camera.updateProjectionMatrix();
   // ------------------------------------
@@ -203,10 +204,7 @@ vBlurPass.uniforms.v.value = blurStrength / window.innerHeight;
 
     return () => {
       resizeObserver?.disconnect();
-      canvasRef.current?.parentElement?.removeEventListener(
-        "mousemove",
-        () => {}
-      );
+      window.removeEventListener("mousemove", onMouseMove);
     };
   }, [onLoaded]);
 

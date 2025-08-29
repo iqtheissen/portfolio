@@ -4,7 +4,7 @@ import RevealText from '../ui/RevealText';
 import SectionHeader from '../ui/SectionHeader';
 import RippleGrid from '@/app/blocks/Backgrounds/RippleGrid/RippleGrid';
 
-export default function AboutSection({ progress, isMobile, scrollY }) {
+export default function AboutSection({ progress, isMobile}) {
   const experiences = [
     {
       title: 'MBO Software Developer',
@@ -155,7 +155,7 @@ export default function AboutSection({ progress, isMobile, scrollY }) {
             rippleIntensity={0.015}
             gridSize={20}
             gridThickness={30}
-            mouseInteraction={true}
+            mouseInteraction={false}
             mouseInteractionRadius={1.2}
             opacity={0.6}
           />

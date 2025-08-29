@@ -1,42 +1,68 @@
 [
-    {
-      "name": "habitica",
-      "title": "Quest Generator",
-      "description": "A tool to generate Habitica-compatible quest content.",
-      "tags": ["game", "habitica", "automation"],
-      "year": 2022,
-      "status": "Completed",
-      "projectLink": "https://habitica.com",
-      "githubLink": "https://github.com/yourname/habitica-generator"
-    },
-    {
-      "name": "phunics",
-      "title": "Phunics Word Game",
-      "description": "A fun phonics-based word game for learners.",
-      "tags": ["education", "game", "phonics"],
-      "year": 2023,
-      "status": "In Progress",
-      "projectLink": "https://phunics.io",
-      "githubLink": "https://github.com/yourname/phunics"
-    },
-    {
-      "name": "gamma",
-      "title": "Gamma Gateway",
-      "description": "A custom dashboard to manage gamma ray telescope data.",
-      "tags": ["dashboard", "science", "data"],
-      "year": 2021,
-      "status": "Completed",
-      "projectLink": "https://gamma.app",
-      "githubLink": "https://github.com/yourname/gamma"
-    },
-    {
-      "name": "delta",
-      "title": "Delta Dashboard",
-      "description": "Business dashboard for visualizing real-time KPIs.",
-      "tags": ["dashboard", "business", "analytics"],
-      "year": 2024,
-      "status": "Beta",
-      "projectLink": "https://delta.io",
-      "githubLink": "https://github.com/yourname/delta"
-    }
-  ]
+  {
+    "name": "pijnwerk",
+    "title": "Pijnwerk",
+    "description": "Website for a horse coaching company, including logo and web design. Goal is to create an informative website where people can learn about this new method of Horse Coaching and reach out to book sessions.",
+    "tags": ["website", "design", "branding", "next.js", "react", "ui/ux"],
+    "year": 2025,
+    "status": "In Progress",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Create an informative and visually appealing website where people can learn about Horse Coaching and easily reach out to book sessions."
+  },
+  {
+    "name": "habitica",
+    "title": "Habitica Quest Generator",
+    "description": "An extension for the productivity app Habitica, utilizing AI to turn your to-do list items into RPG-flavored quests.",
+    "tags": ["javascript", "api", "ai", "prompt-engineering", "extension", "frontend"],
+    "year": 2025,
+    "status": "In Progress",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Enhance productivity by gamifying everyday to-do items and turning them into engaging RPG-style quests within Habitica."
+  },
+  {
+    "name": "truthfairies",
+    "title": "Truthfairies INC",
+    "description": "Website built for a shamanic coaching company. Helped create a brand identity and developed a bold modern website from scratch to reach new customers.",
+    "tags": ["next.js", "javascript", "frontend", "branding", "website", "react", "ui/ux"],
+    "year": 2025,
+    "status": "In Progress",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Reach new customers by creating a bold, modern website with a strong brand identity."
+  },
+  {
+    "name": "tapper",
+    "title": "Coca Cola Tapper",
+    "description": "Hypothetical Coca-Cola branded rendition of the classic arcade game Tapper.",
+    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "year": 2021,
+    "status": "Concept",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Reimagine the classic Tapper arcade game with Coca-Cola branding as a creative design and development exercise."
+  },
+  {
+    "name": "phunics",
+    "title": "Phunics Word Game",
+    "description": "A fun phonics-based word game for learners.",
+    "tags": ["education", "game", "phonics"],
+    "year": 2023,
+    "status": "In Progress",
+    "projectLink": "https://phunics.io",
+    "githubLink": "https://github.com/yourname/phunics",
+    "goal": "Make learning phonics engaging and fun through an interactive word game."
+  },
+  {
+    "name": "recoilrampage",
+    "title": "Recoil Rampage",
+    "description": "⚡ (Need details here — genre, goal, and tech stack).",
+    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "year": 2021,
+    "status": "In Progress",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Create a fast-paced action game focused on recoil mechanics, combining pixel art, music, and engaging gameplay."
+  }
+]

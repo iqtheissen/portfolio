@@ -1,50 +1,104 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import "locomotive-scroll/src/locomotive-scroll.scss";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 
-export default function SmoothScrollContainer({ children, locoScrollRef, onReady, isMobile}) {
+export default function SmoothScrollContainer({ children, locoScrollRef, onReady, isMobile, overflowX = 'hidden'}) {
   const scrollRef = useRef(null);
   
 
   useEffect(() => {
-    if (!scrollRef.current) return;
+      if (!scrollRef.current) return;
 
-    let LocomotiveScroll;
+      let lenisInstance = null;
+      let rafId = null;
 
-    async function initScroll() {
-  LocomotiveScroll = (await import("locomotive-scroll")).default;
+      async function initLenis() {
+        const { default: Lenis } = await import("@studio-freight/lenis");
 
-  locoScrollRef.current = new LocomotiveScroll({
-    el: scrollRef.current,
-    smooth: true,
+        // Use an ease-out cubic easing for natural smoothing; adjust `duration` to taste.
+        lenisInstance = new Lenis({
+            duration: 0.55,
+            easing: (t) => 1 - Math.pow(1 - t, 3), // easeOutCubic
+            smooth: !isMobile,
+            direction: "vertical",
+          });
 
-    lerp: 0.06, // 0.01 (slow and smooth) to 1 (instant) — lower = smoother
-    multiplier: 1,
-    smartphone: { smooth: false}, // Adjust for mobile
-    tablet: { smooth: true },
-  });
+        // expose the instance on the provided ref (keeps API the same from parent)
+        locoScrollRef.current = lenisInstance;
 
-  if (onReady) onReady(); // Notify parent
-}
+        // Wire Lenis to GSAP ScrollTrigger so ScrollTrigger reads Lenis' virtual scroll
+        try {
+          ScrollTrigger.scrollerProxy(document.documentElement, {
+            scrollTop(value) {
+              if (arguments.length) {
+                // programmatic scroll from GSAP -> Lenis
+                lenisInstance.scrollTo(value);
+                return;
+              }
+              return (lenisInstance.scroll && typeof lenisInstance.scroll.y === "number")
+                ? lenisInstance.scroll.y
+                : window.scrollY;
+            },
+            getBoundingClientRect() {
+              return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+            },
+            pinType: document.documentElement.style.transform ? "transform" : "fixed",
+          });
 
-    initScroll();
+          // Update ScrollTrigger on every Lenis scroll
+          if (typeof lenisInstance.on === "function") {
+            lenisInstance.on("scroll", () => {
+              ScrollTrigger.update();
+            });
+          }
 
-    const onResize = () => locoScrollRef.current?.update();
-    window.addEventListener("resize", onResize);
+          // Ensure ScrollTrigger knows about initial layout
+          ScrollTrigger.refresh();
+        } catch (e) {
+          // Silently ignore if ScrollTrigger isn't available or errors
+          // eslint-disable-next-line no-console
+          console.warn("ScrollTrigger setup skipped:", e);
+        }
 
-    return () => {
-      window.removeEventListener("resize", onResize);
-      if (locoScrollRef.current) {
-        locoScrollRef.current.destroy();
-        locoScrollRef.current = null;
+        if (onReady) onReady(); // notify parent the scroller is ready
+
+        // RAF loop to drive Lenis
+        const loop = (time) => {
+          lenisInstance.raf(time);
+          rafId = requestAnimationFrame(loop);
+        };
+
+        rafId = requestAnimationFrame(loop);
       }
-    };
-  }, [locoScrollRef]);
+
+      initLenis();
+
+      // best-effort resize hook: if the lib exposes update/resize, call it
+      const onResize = () => {
+        if (locoScrollRef.current && typeof locoScrollRef.current.update === "function") {
+          locoScrollRef.current.update();
+        }
+      };
+
+      window.addEventListener("resize", onResize);
+
+      return () => {
+        window.removeEventListener("resize", onResize);
+        if (rafId) cancelAnimationFrame(rafId);
+        if (locoScrollRef.current) {
+          if (typeof locoScrollRef.current.destroy === "function") locoScrollRef.current.destroy();
+          locoScrollRef.current = null;
+        }
+      };
+    }, [locoScrollRef, isMobile]);
 
   return (
-    <div data-scroll-container ref={scrollRef} style={{ overflow: "hidden" }}>
+    <div data-scroll-container ref={scrollRef} style={{ overflowX }}>
       {children}
     </div>
   );

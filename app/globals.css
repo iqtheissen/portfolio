@@ -185,6 +185,22 @@ body{
   height:100%;
 }
 
+/* Final guard: on small screens ensure no horizontal scroll is possible */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+  }
+}
+
+/* Global box-sizing and overflow-x guard to prevent accidental horizontal scroll */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #__next, [data-scroll-container] {
+  overflow-x: hidden !important;
+}
+
 
 
 #loader{

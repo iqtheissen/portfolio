@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { gsap } from "gsap";
 import SmoothScrollContainer from "./components/SmoothScrollContainer";
 import HeroSection from "./components/sections/HeroSection";
 import Navbar from "./components/ui/Navbar";
 import ProjectSection from "./components/sections/ProjectSection";
 import LoadingBar from "./components/ui/LoadingBar";
 import VantaFog from "./components/background/VantaFog";
+import projects from "./data/projects.json";
 import useSectionProgress from "./hooks/useSectionProgress";
 import useScrollProgressBetweenSections from "./hooks/useScrollProgressBetweenSections";
-import useThrottle from "./hooks/useThrottle";
 import ThreeScene from "./components/background/ThreeScene";
 import AboutSection from "./components/sections/AboutSection";
 import useMediaQuery from "./hooks/useMediaQuery"; // ✅ default import
@@ -22,10 +23,12 @@ export default function Home() {
   const [animationFinished, setAnimationFinished] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
   const [isLocoReady, setIsLocoReady] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
 
   // NEW: state to control mobile overlay open/close
   const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false);
+
+  // Lifted selected project state so background can react to it
+  const [selectedProject, setSelectedProject] = useState(projects[0] || null);
 
   const locoScrollRef = useRef(null);
   const threeSceneRef = useRef(null);
@@ -37,32 +40,21 @@ export default function Home() {
   const startAnimation = !loading;
 
   const sectionIds = ["hero", "about", "projects"];
-  const { activeSection, sectionProgress } = useSectionProgress(sectionIds, scrollY);
+  const { activeSection, sectionProgress } = useSectionProgress(sectionIds);
 
-  const heroToProjectsProgress = useScrollProgressBetweenSections("hero", "projects", scrollY);
+  const heroToProjectsProgress = useScrollProgressBetweenSections("hero", "projects");
 
   const onVantaLoaded = useCallback(() => {
     console.log("VantaFog loaded");
   }, []);
 
   const handleAssetsLoaded = useCallback(() => {
-    setAssetsLoaded(true);
+  console.log("handleAssetsLoaded -> assetsLoaded = true");
+  setAssetsLoaded(true);
   }, []);
 
-  const handleScroll = useThrottle((instance) => {
-    setScrollY(instance.scroll.y);
-  }, 20);
-
-  useEffect(() => {
-    const locoScroll = locoScrollRef.current;
-    if (!locoScroll || !isLocoReady) return;
-
-    locoScroll.on("scroll", handleScroll);
-
-    return () => {
-      locoScroll.off("scroll", handleScroll);
-    };
-  }, [isLocoReady, handleScroll]);
+  // Stable onScroll callback (stable identity)
+  // We no longer track raw scrollY; progress is driven by GSAP ScrollTrigger hooks.
 
   useEffect(() => {
     if (!loading) {
@@ -80,54 +72,147 @@ export default function Home() {
     if (typeof window === "undefined") return;
 
     if (loading || isMobileOverlayOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflowY = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      document.body.style.overflowY = "auto";
+    }
+    // prevent accidental horizontal scroll on small viewports
+    document.body.style.overflowX = isMobile ? "hidden" : "auto";
+
+    return () => {
+      document.body.style.overflowY = "auto";
+      document.body.style.overflowX = "auto";
+    };
+  }, [loading, isMobileOverlayOpen, isMobile]);
+
+  const parallaxSpeed = 0.2;
+  // Use hero->projects progress to drive parallax when scrollY is no longer tracked
+  // Guard access to window for SSR (window is undefined on server)
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 0;
+  const parallaxOffset = -(heroToProjectsProgress || 0) * viewportHeight * parallaxSpeed;
+
+  // Compute a sidebar width percent that matches the previous behaviour
+  // but keep the element itself full-width. We'll remap the original
+  // gradient stop percentages into the right-hand region that represents
+  // the simulated sidebar width so the visual remains identical.
+  const sidebarWidthPercent = isMobile
+    ? Math.min(100, 80 + (heroToProjectsProgress || 0) * 50)
+    : Math.max(0, 100 - (heroToProjectsProgress || 0) * 50);
+
+  const originalStops = [19, 46, 57, 73];
+  const leftBoundary = 100 - sidebarWidthPercent; // where the simulated sidebar begins
+  const mappedStops = originalStops.map((s) => leftBoundary + (s / 100) * sidebarWidthPercent);
+  const sidebarGradient = `linear-gradient(90deg, rgba(0, 0, 0, 0) ${mappedStops[0]}%, rgba(0, 0, 0, 0.59) ${mappedStops[1]}%, rgba(0, 0, 0, 0.84) ${mappedStops[2]}%, rgba(0, 0, 0, 1) ${mappedStops[3]}%)`;
+
+  // Mobile black-flash sequencing: we briefly show a full black overlay
+  // while swapping which gradient is active so the transition goes fully
+  // black in the middle, then reveals the reversed gradient.
+  const [blackFlash, setBlackFlash] = useState(false);
+  const [activeSide, setActiveSide] = useState(!isMobile || !isMobileOverlayOpen ? "right" : "left");
+
+  useEffect(() => {
+    if (!isMobile) return; // only apply sequencing on mobile
+
+    // Start with a quick black flash, then switch the active side, then
+    // fade the black overlay out.
+    setBlackFlash(true);
+    const switchDelay = 500; // ms (time black is visible before swapping)
+    const t1 = setTimeout(() => {
+      setActiveSide(isMobileOverlayOpen ? "left" : "right");
+    }, switchDelay);
+    const t2 = setTimeout(() => setBlackFlash(false), switchDelay + 50);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isMobileOverlayOpen, isMobile]);
+
+  // Mobile: use a CSS transition for percentage-based shifts
+  useEffect(() => {
+    const el = threeSceneRef.current;
+    if (!el) return;
+
+    if (isMobile) {
+  // Default: half-obscured by the right edge. When overlay opens, bring into view.
+  // Use positive translateX percentage relative to its own width since the element is anchored right:0
+  const targetX = isMobileOverlayOpen ? "-40%" : "60%";
+  el.style.transition = "transform 2s cubic-bezier(.22,.9,.35,1)";
+  el.style.transform = `translateY(-50%) translateX(${targetX})`;
     }
 
     return () => {
-      document.body.style.overflow = "auto";
+      if (!el) return;
+      // clear inline transition to avoid interfering with other code
+      el.style.transition = "";
     };
-  }, [loading, isMobileOverlayOpen]);
+  }, [isMobile, isMobileOverlayOpen]);
 
-  const parallaxSpeed = 0.2;
-  const parallaxOffset = -scrollY * parallaxSpeed;
-
+  // Desktop: use GSAP quickTo to smoothly animate the element's x to match Lenis easing
   useEffect(() => {
-  const el = threeSceneRef.current;
-  if (!el) return;
+    const el = threeSceneRef.current;
+    if (!el || isMobile) return;
 
-  let animationFrameId;
+    // Ensure the element is vertically centered like the previous RAF loop
+    // (previous code applied `translateY(-50%)` each frame). Use GSAP to set
+    // yPercent so GSAP-managed transforms preserve vertical centering.
+    try {
+      gsap.set(el, { yPercent: -50 });
+    } catch (e) {}
 
-  const update = () => {
-    let targetX;
+    // quickTo returns a function that smoothly tweens the 'x' property
+    const smoothX = gsap.quickTo(el, "x", { duration: 0.85, ease: "power3.out" });
 
-    if (isMobile) {
-      // 🔁 Switch to fixed percentage shift on mobile based on overlay
-      targetX = isMobileOverlayOpen ? "-40%" : "60%";
-      el.style.transform = `translateY(-50%) translateX(${targetX})`;
-      el.style.transition = "transform 1.5s ease-in-out";
-    } else {
-      // 🧮 Scroll-reactive animation on desktop
-      const width = el.offsetWidth / 1.5;
-      const progress = Math.min(Math.max(heroToProjectsProgress || 0, 0), 1);
-      targetX = progress * width;
-      lastXRef.current += (targetX - lastXRef.current) * 0.1;
+    // apply the current target once
+    const width = el.offsetWidth / 1.5;
+    const progress = Math.min(Math.max(heroToProjectsProgress || 0, 0), 1);
+    const targetX = progress * width;
+    smoothX(targetX);
 
-      el.style.transform = `translateY(-50%) translateX(${lastXRef.current}px) translateZ(0)`;
-    }
-
-    animationFrameId = requestAnimationFrame(update);
-  };
-
-  animationFrameId = requestAnimationFrame(update);
-  return () => cancelAnimationFrame(animationFrameId);
-}, [isMobile, heroToProjectsProgress, isMobileOverlayOpen]);
+    return () => {
+      // kill any tweens on this element's transform x property to clean up
+      try {
+        gsap.killTweensOf(el, { x: true });
+      } catch (e) {}
+    };
+  }, [isMobile, heroToProjectsProgress]);
 
 
   return (
     <>
-      <TargetCursor spinDuration={10} hideDefaultCursor={true} />
+      
+      {!isMobile && (
+        <TargetCursor spinDuration={10} hideDefaultCursor={true} />
+      )}
+
+      {/* Debug overlay: shows Lenis scrollY and section progress values */}
+      <div
+        style={{
+          position: "fixed",
+          left: 12,
+          top: 12,
+          zIndex: 99999,
+          background: "rgba(0,0,0,0.65)",
+          color: "#b7f5c6",
+          padding: "8px 10px",
+          fontSize: 12,
+          fontFamily: "Menlo, monospace",
+          borderRadius: 6,
+          pointerEvents: "none",
+          lineHeight: 1.4,
+        }}
+      >
+          
+          <div>hero→projects: {(heroToProjectsProgress || 0).toFixed(3)}</div>
+          <div>active: {String(activeSection)}</div>
+          <div>
+            sectionProg: {sectionProgress && sectionProgress[activeSection] != null ? sectionProgress[activeSection].toFixed(3) : "0.000"}
+          </div>
+          <div>assetsLoaded: {String(assetsLoaded)}</div>
+          <div>animationFinished: {String(animationFinished)}</div>
+          <div>loading: {String(loading)}</div>
+          <div>showLoading: {String(showLoading)}</div>
+      </div>
       {showLoading && (
         <div
           style={{
@@ -147,7 +232,7 @@ export default function Home() {
             zIndex: 9999,
           }}
         >
-          <LoadingBar onComplete={() => setAnimationFinished(true)} />
+          <LoadingBar onComplete={() => { console.log('LoadingBar onComplete -> animationFinished = true'); setAnimationFinished(true); }} />
         </div>
       )}
 
@@ -155,6 +240,7 @@ export default function Home() {
         locoScrollRef={locoScrollRef}
         onReady={() => setIsLocoReady(true)}
         isMobile={isMobile}
+        overflowX={isMobile ? "hidden" : "auto"}
       >
         {/* Pass isMobileOverlayOpen + setter to Navbar */}
         <Navbar
@@ -172,28 +258,67 @@ export default function Home() {
           parallaxSpeed={parallaxSpeed}
           activeSection={activeSection}
           progress={sectionProgress[activeSection] || 0}
+          project={selectedProject}
           isMobile={isMobile}
         />
 
-        {/* Sidebar Gradient */}
+        {/* Sidebar Gradient: two layered gradients that crossfade on mobile */}
         <div
           style={{
             position: "fixed",
-            top: 0,
-            right: 0,
-            width: isMobile
-              ? `${80 + heroToProjectsProgress * 50}vw`
-              : `${100 - heroToProjectsProgress * 50}vw`,
+            inset: 0,
+            width: "100vw",
             height: "100%",
-            background:
-              "linear-gradient(90deg, rgba(0, 0, 0, 0) 19%, rgba(0, 0, 0, 0.59) 46%, rgba(0, 0, 0, 0.84) 57%, rgba(0, 0, 0, 1) 73%)",
             pointerEvents: "none",
             zIndex: 1,
           }}
-        />
+        >
+          {/* Right-side gradient (desktop / mobile when right is active) */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              background: sidebarGradient,
+              transition: "opacity 1s cubic-bezier(.22,.9,.35,1)",
+              opacity: !isMobile ? 1 : blackFlash ? 0 : activeSide === "right" ? 1 : 0,
+            }}
+          />
+
+          {/* Left-side gradient (mobile when left is active) */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              background: `linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) ${sidebarWidthPercent}%, rgba(0,0,0,0) 100%)`,
+              transition: "opacity 1s cubic-bezier(.22,.9,.35,1)",
+              opacity: !isMobile ? 0 : blackFlash ? 0 : activeSide === "left" ? 1 : 0,
+            }}
+          />
+
+          {/* Black flash overlay that sits above the gradients during the swap */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              background: "black",
+              transition: "opacity 300ms linear",
+              opacity: blackFlash ? 1 : 0,
+              zIndex: 2,
+            }}
+          />
+        </div>
 
         {/* Invisible scroll section just to satisfy Locomotive Scroll */}
-        <div data-scroll-section style={{ display: "contents", overflow: "hidden" }}>
+        <div data-scroll-section style={{ display: "contents", overflow: "auto" }}>
           <div
             ref={threeSceneRef}
             style={{
@@ -201,6 +326,7 @@ export default function Home() {
               top: "50%",
               right: "0",
               width: isMobile ? "70vh" : "40vw",
+              
               height: isMobile ? "70vh" : "40vw",
               background: "transparent",
               borderRadius: "20px",
@@ -227,21 +353,24 @@ export default function Home() {
               onAssetsLoaded={handleAssetsLoaded}
               startAnimation={startAnimation}
               isMobile={isMobile}
+              progress={heroToProjectsProgress}
             />
           </section>
           <section id="about" data-scroll-section data-section-id="about">
             <AboutSection
               isMobile={isMobile}
-              progress={useScrollProgressBetweenSections("hero", "about", scrollY)}
-              scrollY={scrollY}
+              progress={useScrollProgressBetweenSections("hero", "about")}
+              
             />
           </section>
           <section id="projects" data-scroll-section data-section-id="projects">
             <ProjectSection
-              progress={useScrollProgressBetweenSections("about", "projects", scrollY)}
+              progress={useScrollProgressBetweenSections("about", "projects")}
               isMobile={isMobile}
               isMobileOverlayOpen={isMobileOverlayOpen}
-        setIsMobileOverlayOpen={setIsMobileOverlayOpen}
+              setIsMobileOverlayOpen={setIsMobileOverlayOpen}
+              selectedProject={selectedProject}
+              onProjectChange={(p) => setSelectedProject(p)}
             />
             
           </section>
