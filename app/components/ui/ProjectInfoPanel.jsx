@@ -84,7 +84,7 @@ export default function ProjectInfoPanel({
       >
         {project.tags.map((tech, index) => (
           <div key={tech + index} data-reveal>
-            <TechTag text={tech} color="#61dafb" />
+            <TechTag text={tech}  />
           </div>
         ))}
       </div>
