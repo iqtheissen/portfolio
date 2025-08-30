@@ -22,6 +22,7 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
   const titleLine1Ref = useRef(null);
   const titleLine2Ref = useRef(null);
   const rotatingRef = useRef(null);
+  const socialRef = useRef(null);
 
   const [lineHeight, setLineHeight] = useState("0%");
   const [dividerHeight, setDividerHeight] = useState("15%");
@@ -61,7 +62,7 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
     // progress is 0..1 between hero and projects; map to visual properties
     const p = Math.min(Math.max(progress || 0, 0), 1);
 
-    const newLineHeight = p <= 0.001 ? "100%" : "0%";
+    const newLineHeight = p <= 0.3 ? "100%" : "0%";
 
     const viewportH = typeof window !== "undefined" ? window.innerHeight : 800;
     const minHeightPx = viewportH * 0.15;
@@ -159,6 +160,41 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
     return () => {
       window.removeEventListener("resize", handleResize);
       if (ctx) ctx.revert();
+    };
+  }, [isMobile]);
+
+  // Make the social icons fixed on the viewport and hide/show them with a binary trigger
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!socialRef.current || !heroRef.current) return;
+    if (isMobile) return; // keep mobile simple
+
+    const el = socialRef.current;
+
+    // Ensure starting state
+    gsap.set(el, { opacity: 1, y: 0 });
+
+    // Hide when hero bottom crosses the top of the viewport. Reverse when scrolling back above.
+    const tween = gsap.to(el, {
+      opacity: 0,
+      duration: 0.2,
+      ease: "power2.out",
+      paused: true,
+    });
+
+    const st = ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: "bottom top",
+      onEnter: () => tween.play(),
+      onLeaveBack: () => tween.reverse(),
+      // Also handle immediate re-entry from below
+      onLeave: () => {},
+      onEnterBack: () => {},
+    });
+
+    return () => {
+      tween.kill();
+      st && st.kill();
     };
   }, [isMobile]);
 
@@ -278,18 +314,27 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
         >
           {/* Sticky icon column using native CSS sticky positioning */}
           <div
+            ref={socialRef}
             style={{
-              position: "sticky",
+              position: "fixed",
+              left: "1rem",
               top: "10rem",
               display: "flex",
               flexDirection: "column",
               gap: "1rem",
               width: "3.5rem",
               paddingLeft: ".7rem",
+              zIndex: 999,
             }}
           >
-            <IconButton icon={<img src="/icons/linkedin.svg" alt="LinkedIn" />} />
-            <IconButton icon={<img src="/icons/github.svg" alt="GitHub" />} />
+            <IconButton
+              icon={<img src="/icons/linkedin.svg" alt="LinkedIn" />}
+              onClick={() => window.open('https://www.linkedin.com/in/quinttheissen', '_blank', 'noopener,noreferrer')}
+            />
+            <IconButton
+              icon={<img src="/icons/github.svg" alt="GitHub" />}
+              onClick={() => window.open('https://github.com/iqtheissen', '_blank', 'noopener,noreferrer')}
+            />
           </div>
 
           <div
@@ -299,6 +344,8 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
               background: "linear-gradient(to bottom, white, transparent)",
               transition: "height 0.8s ease-in-out",
               pointerEvents: "none",
+              // offset to account for the fixed social icons (3.5rem width + 0.7rem padding)
+              marginLeft: "4.2rem",
             }}
           />
         </div>
