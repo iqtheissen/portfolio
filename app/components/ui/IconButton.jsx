@@ -4,9 +4,8 @@ export default function IconButton({ icon, tag = "", onClick }) {
   return (
     <button
       
-      className="cursor-target icon-btn relative w-[60px] h-[60px] group overflow-visible
-                 bg-[#000304] hover:bg-[#010F15] transition-colors duration-300
-                 will-change-[background-color] flex items-center justify-center"
+  className="cursor-target icon-btn relative w-[60px] h-[60px] group overflow-visible
+         transition-colors duration-300 will-change-[background-color] flex items-center justify-center"
       onClick={onClick}
     >
 {/* Base Outline */}
@@ -19,7 +18,7 @@ export default function IconButton({ icon, tag = "", onClick }) {
   <path
     d="M7 25.293L0.5 18.793V0.5H54.7881L70.5 16.7021V70.5H14.2021L0.5 57.2871V46.2314L6.82324 40.8818L7 40.7314V25.293Z"
     stroke="#ffffff"
-    fill="none"
+    className="fill-[#000304] group-hover:fill-[#010F15] transition-colors duration-300"
   />
 </svg>
 

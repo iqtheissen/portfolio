@@ -74,8 +74,7 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
   }, [progress, isMobile]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (isMobile) return; // skip heavy scroll animations on mobile
+  if (typeof window === "undefined") return;
 
     let ctx = null;
 
@@ -89,7 +88,8 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
   const vh = window.innerHeight || 800;
   const vw = window.innerWidth || 1200;
   // Use a single uniform vertical parallax for all text elements (viewport-scaled)
-  const yUniform = Math.round(vh * 0.36);
+  // Reduce parallax on mobile to keep motion subtle and performant.
+  const yUniform = Math.round(vh * (isMobile ? 0.18 : 0.36));
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -113,7 +113,9 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
         tl.to(titleLine2Ref.current, { x: -20, opacity: 0,  ease: "power1.out", duration: quickDur * 3 }, t0 + step * 2);
 
         if (rotatingItems.length) {
-          tl.to(rotatingItems, { x: -vw/2.5, ease: "sine.in", duration: quickDur * 8 }, t0);
+          // Reduce horizontal travel on small screens so the effect remains visible but not excessive
+          const rotateX = isMobile ? -vw / 6 : -vw / 2.5;
+          tl.to(rotatingItems, { x: rotateX, ease: "sine.in", duration: quickDur * 8 }, t0);
         }
 
         // Persistent vertical parallax: uniform y movement for all text elements so they always scroll down with the user.

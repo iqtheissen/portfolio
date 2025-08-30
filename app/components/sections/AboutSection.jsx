@@ -3,6 +3,8 @@ import ProjectCard from '../ui/ProjectCard';
 import RevealText from '../ui/RevealText';
 import SectionHeader from '../ui/SectionHeader';
 import RippleGrid from '@/app/blocks/Backgrounds/RippleGrid/RippleGrid';
+import CyberButton from '../ui/CyberButton';
+import DownloadButton from '../ui/DownloadButton';
 
 export default function AboutSection({ progress, isMobile}) {
   const experiences = [
@@ -105,19 +107,16 @@ export default function AboutSection({ progress, isMobile}) {
         progress={progress}
         fromLeft={false}
         isMobile={isMobile}
-        
-        >
-      </SectionHeader>
-        
+      />
+
       {/* Experience Cards */}
       <div
-      
         style={{
           flex: isMobile ? 'unset' : 1,
           width: isMobile ? '100%' : 'auto',
           height: isMobile ? '50vh' : '400px',
           maxWidth: isMobile ? '100%' : '35vw',
-          marginBottom : isMobile ? '40vh' : 0,
+          marginBottom: isMobile ? '40vh' : 0,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -138,9 +137,7 @@ export default function AboutSection({ progress, isMobile}) {
             position: 'absolute',
             left: '50%',
             top: '50%',
-            transform: isMobile
-              ? 'translate(-50%, -50%) scale(1.6)'
-              : 'translate(-50%, -50%) scale(1.4)',
+            transform: isMobile ? 'translate(-50%, -50%) scale(1.6)' : 'translate(-50%, -50%) scale(1.4)',
             width: isMobile ? '160%' : '140%',
             height: isMobile ? '160%' : '140%',
             zIndex: 0,
@@ -160,7 +157,7 @@ export default function AboutSection({ progress, isMobile}) {
             opacity={0.6}
           />
         </div>
-              
+
         {experiences.map((exp, idx) => {
           const offset = idx - activeIndex;
           if (offset < -2 || offset > 2) return null;
@@ -178,10 +175,9 @@ export default function AboutSection({ progress, isMobile}) {
                 position: 'absolute',
                 left: '50%',
                 top: '50%',
-                transform: `translateX(${translateX}px) translateY(-50%) scale(${scale})`,
+                transform: `translate(calc(-50% + ${translateX}px), -50%) scale(${scale})`,
                 width: isMobile ? '75vw' : '25vw',
                 height: isMobile ? '80%' : 'auto',
-                transform: `translate(calc(-50% + ${translateX}px), -50%) scale(${scale})`,
                 transition: 'transform 0.5s ease, opacity 0.5s ease',
                 zIndex,
                 opacity,
@@ -266,13 +262,14 @@ export default function AboutSection({ progress, isMobile}) {
             }}
           />
         </button>
+
+  {/* Download CV removed from carousel (moved under About text) */}
       </div>
 
       {/* About Text */}
       <div
         style={{
           flex: isMobile ? 'unset' : 1,
-          
           maxWidth: isMobile ? '100%' : '30vw',
           fontSize: isMobile ? '1rem' : '1rem',
           lineHeight: 1.7,
@@ -289,7 +286,7 @@ export default function AboutSection({ progress, isMobile}) {
         data-scroll-speed="2"
         data-scroll-direction="vertical"
       >
-        <RevealText progress={progress} start={0.3} end={1} >
+        <RevealText progress={progress} start={0.3} end={1}>
           <p style={{ marginBottom: isMobile ? '0.75rem' : '1rem' }}>
             I am a passionate software developer with a solid foundation in front-end, PHP-based back-end development, and game development. Throughout my education at MBO Utrecht and hands-on experiences at AXiS Digitaal and Hogeschool Utrecht, I have gained practical expertise in building web, mobile, and desktop applications across a variety of technologies, including Java, C#, JavaFX, Unity, React Native, and WordPress.
           </p>
@@ -301,6 +298,10 @@ export default function AboutSection({ progress, isMobile}) {
           </p>
         </RevealText>
 
+        {/* Download CV: right-aligned under the About text */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: isMobile ? '4vh' : '1.5rem' }}>
+          <DownloadButton href="/cv.pdf" text="Download CV" />
+        </div>
       </div>
     </section>
   );

@@ -7,6 +7,9 @@ export default function CyberButton({
   decryptedText = "Decrypted",
   tag = "",
   onClick,
+  icon = null,
+  disabled = false,
+  textLeft = false,
 }) {
   const { displayText, startAnimation, resetText } = useDecryptAnimation({
     originalText: children,
@@ -16,12 +19,14 @@ export default function CyberButton({
 
   return (
     <button
-      className="cursor-target cyber-btn relative w-[200px] h-[60px] group overflow-visible
-                 bg-[#000304] hover:bg-[#010F15] transition-colors duration-300
-                 will-change-[background-color]"
-      onClick={onClick}
-      onMouseEnter={startAnimation}
-      onMouseLeave={resetText}
+      className={
+        "cursor-target cyber-btn relative w-[200px] h-[60px] group overflow-visible transition-colors duration-300 will-change-[background-color] flex items-center px-4" +
+        (disabled ? " opacity-50 pointer-events-none" : "")
+      }
+      onClick={disabled ? undefined : onClick}
+      onMouseEnter={disabled ? undefined : startAnimation}
+      onMouseLeave={disabled ? undefined : resetText}
+      disabled={disabled}
     >
       {/* Base outline */}
       <svg
@@ -33,6 +38,7 @@ export default function CyberButton({
           d="M184.793 0.5L199.5 15.207V59.5H15.207L0.5 44.793V0.5H184.793Z"
           stroke="#ffffff"
           strokeWidth="1"
+          className="fill-[#000304] group-hover:fill-[#010F15] transition-colors duration-300"
         />
       </svg>
 
@@ -58,10 +64,22 @@ export default function CyberButton({
         </svg>
       </div>
 
-      {/* Button text */}
-      <span className="relative z-40 text-white font-bold tracking-wider">
+      {/* Button text: optionally left-aligned (opt-in) otherwise centered by default */}
+      <span
+        className={
+          "relative z-40 text-white font-bold tracking-wider " +
+          (textLeft ? "flex-1 text-left pl-4" : "mx-auto")
+        }
+      >
         {displayText}
       </span>
+
+      {/* Optional icon positioned at the right edge, not affecting text layout */}
+      {icon && (
+        <span className="relative z-40 ml-auto flex-none" aria-hidden>
+          {icon}
+        </span>
+      )}
 
       {/* Tag */}
       {tag && (
