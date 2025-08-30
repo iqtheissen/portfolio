@@ -12,9 +12,9 @@ export default function ProjectDisplay({
   disableInteractions = false,
 }) {
   const images = {
-    main: `/projects/${project.name}/main.png`,
-    small1: `/projects/${project.name}/small1.png`,
-    small2: `/projects/${project.name}/small2.png`,
+    main: `/projects/${project.name}/main.jpg`,
+    small1: `/projects/${project.name}/small1.jpg`,
+    small2: `/projects/${project.name}/small2.jpg`,
   };
 
   const [imagesDone, setImagesDone] = useState(false);

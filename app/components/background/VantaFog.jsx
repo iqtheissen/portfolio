@@ -46,54 +46,126 @@ export default function VantaFog({ onLoaded, parallaxY = 0, activeSection, progr
     zoom: 0.85,
   };
 
+  const debugScheme = {
+    highlightColor: 0x111111,  // bright, vibrant cyan-blue
+    midtoneColor: 0x145a6a,
+    lowlightColor: 0x00c8ff,
+    baseColor: 0x111111,
+    blurFactor: 0.6,
+    speed: 1.4,
+    zoom: 0.85,
+  };
+
+  // --- Debug UI state (live-editable copy of `debugScheme`) ---
+  // Colors in the UI use CSS hex strings (#rrggbb) for inputs; convert
+  // from numeric 0x... to strings on init.
+  const numToHex = (n) => `#${(n || 0).toString(16).padStart(6, "0")}`;
+  const hexToNum = (h) => parseInt((h || "#000000").replace(/^#/, ""), 16);
+
+  const [showDebugUI, setShowDebugUI] = useState(false);
+  const [debugState, setDebugState] = useState({
+    highlightColor: numToHex(debugScheme.highlightColor),
+    midtoneColor: numToHex(debugScheme.midtoneColor),
+    lowlightColor: numToHex(debugScheme.lowlightColor),
+    baseColor: numToHex(debugScheme.baseColor),
+    blurFactor: debugScheme.blurFactor,
+    speed: debugScheme.speed,
+    zoom: debugScheme.zoom,
+  });
+
+  // Apply edits in real-time to Vanta when available
+  useEffect(() => {
+    if (!vantaEffect.current || !vantaReady) return;
+    try {
+      vantaEffect.current.setOptions({
+        highlightColor: hexToNum(debugState.highlightColor),
+        midtoneColor: hexToNum(debugState.midtoneColor),
+        lowlightColor: hexToNum(debugState.lowlightColor),
+        baseColor: hexToNum(debugState.baseColor),
+        blurFactor: Number(debugState.blurFactor),
+        speed: Number(debugState.speed),
+        zoom: Number(debugState.zoom),
+      });
+    } catch (e) {
+      // ignore
+    }
+  }, [debugState, vantaReady]);
+
+  const copyDebugToClipboard = async () => {
+    const text = `highlightColor: 0x${hexToNum(debugState.highlightColor).toString(16).padStart(6, "0")},\nmidtoneColor: 0x${hexToNum(debugState.midtoneColor).toString(16).padStart(6, "0")},\nlowlightColor: 0x${hexToNum(debugState.lowlightColor).toString(16).padStart(6, "0")},\nbaseColor: 0x${hexToNum(debugState.baseColor).toString(16).padStart(6, "0")},\n    blurFactor: ${debugState.blurFactor},\n    speed: ${debugState.speed},\n    zoom: ${debugState.zoom},\n`;
+    try {
+      await navigator.clipboard.writeText(text);
+      // optional visual feedback could be added
+    } catch (e) {
+      console.warn("Copy failed", e);
+    }
+  };
+
     // Project-specific, exaggerated colour schemes keyed by project name
     const projectColorSchemes = {
-      delta: {
-        highlightColor: 0xff5b5b, // hot red
-        midtoneColor: 0xffa65b,   // orange
-        lowlightColor: 0xfff27b,  // yellow
-        baseColor: 0x220000,
-        blurFactor: 0.75,
-        speed: 1.8,
-        zoom: 1.1,
-      },
-      gamma: {
-        highlightColor: 0x7b61ff, // vivid purple
-        midtoneColor: 0x5b8bff,   // bright blue
-        lowlightColor: 0x00ffc8,  // teal
-        baseColor: 0x0b0a1a,
-        blurFactor: 0.65,
-        speed: 1.6,
-        zoom: 0.95,
-      },
-      habitica: {
-        highlightColor: 0x00ff8a, // neon green
-        midtoneColor: 0x00e6b8,
-        lowlightColor: 0x00c8ff,
-        baseColor: 0x00110a,
-        blurFactor: 0.7,
-        speed: 1.2,
-        zoom: 1.0,
-      },
-      phunics: {
-        highlightColor: 0xff00c8, // hot magenta
-        midtoneColor: 0xff6fbf,
-        lowlightColor: 0xffb86f,
-        baseColor: 0x200010,
-        blurFactor: 0.72,
-        speed: 1.7,
-        zoom: 1.05,
-      },
-      pijnwerk: {
-        highlightColor: 0x00c8ff, // electric cyan
-        midtoneColor: 0x5be1ff,
-        lowlightColor: 0x7bffd6,
-        baseColor: 0x081122,
-        blurFactor: 0.6,
-        speed: 1.3,
-        zoom: 0.9,
-      },
-    };
+  pijnwerk: {
+    highlightColor: 0x294110,
+midtoneColor: 0x0f330a,
+lowlightColor: 0x99877a,
+baseColor: 0x1c3319,
+    blurFactor: 0.6,
+    speed: 1.4,
+    zoom: 0.85,
+
+
+  },
+  habitica: {
+   highlightColor: 0x201320,
+midtoneColor: 0xa00ae6,
+lowlightColor: 0xf6e3f8,
+baseColor: 0x111111,
+    blurFactor: 0.53,
+    speed: 1.4,
+    zoom: 1.86,
+
+
+  },
+  truthfairies: {
+    highlightColor: 0x3a2735,
+midtoneColor: 0x574860,
+lowlightColor: 0x161413,
+baseColor: 0x311727,
+    blurFactor: 1.42,
+    speed: 0.45,
+    zoom: 1.76,
+
+  },
+  tapper: {
+    highlightColor: 0x657b81,
+midtoneColor: 0x6b1a1a,
+lowlightColor: 0x729ec0,
+baseColor: 0x5d6c6f,
+    blurFactor: 1.41,
+    speed: 0.55,
+    zoom: 1.12,
+
+  },
+  phunics: {
+    highlightColor: 0x1c1c1c,
+midtoneColor: 0x145a6a,
+lowlightColor: 0xaacf4a,
+baseColor: 0x87b8a2,
+    blurFactor: 0.61,
+    speed: 1.24,
+    zoom: 1.35,
+
+  },
+  recoilrampage: {
+    highlightColor: 0x3e2828,
+midtoneColor: 0xa74916,
+lowlightColor: 0x16150e,
+baseColor: 0x211c1c,
+    blurFactor: 0.76,
+    speed: 1.4,
+    zoom: 1.13,
+
+  },
+};
 
   
 
@@ -349,20 +421,96 @@ export default function VantaFog({ onLoaded, parallaxY = 0, activeSection, progr
   
 
   return (
-    <div
-  ref={vantaRef}
-  style={{
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: fogHeight,
-    zIndex: -1,
-    pointerEvents: "none",
-    transform: `translateY(${parallaxY}px)`,
-    willChange: "transform",
-  }}
-/>
+    <>
+      <div
+        ref={vantaRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: fogHeight,
+          zIndex: -1,
+          pointerEvents: "none",
+          transform: `translateY(${parallaxY}px)`,
+          willChange: "transform",
+        }}
+      />
 
+      {/* Debug UI overlay (additive) */}
+      <div
+        style={{
+          position: "fixed",
+          right: 12,
+          bottom: 12,
+          zIndex: 9999,
+          pointerEvents: "auto",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        <button
+          onClick={() => setShowDebugUI((s) => !s)}
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            color: "white",
+            border: "none",
+            padding: "8px 10px",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}
+        >
+          {showDebugUI ? "Close Vanta Debug" : "Open Vanta Debug"}
+        </button>
+
+        {showDebugUI && (
+          <div
+            style={{
+              marginTop: 8,
+              background: "rgba(0,0,0,0.8)",
+              color: "white",
+              padding: 12,
+              borderRadius: 8,
+              minWidth: 260,
+            }}
+          >
+            <div style={{ display: "grid", gap: 8 }}>
+              <label style={{ fontSize: 12 }}>Highlight</label>
+              <input type="color" value={debugState.highlightColor} onChange={(e) => setDebugState((s) => ({ ...s, highlightColor: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Midtone</label>
+              <input type="color" value={debugState.midtoneColor} onChange={(e) => setDebugState((s) => ({ ...s, midtoneColor: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Lowlight</label>
+              <input type="color" value={debugState.lowlightColor} onChange={(e) => setDebugState((s) => ({ ...s, lowlightColor: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Base</label>
+              <input type="color" value={debugState.baseColor} onChange={(e) => setDebugState((s) => ({ ...s, baseColor: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Blur</label>
+              <input type="range" min="0" max="2" step="0.01" value={debugState.blurFactor} onChange={(e) => setDebugState((s) => ({ ...s, blurFactor: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Speed</label>
+              <input type="range" min="0" max="3" step="0.01" value={debugState.speed} onChange={(e) => setDebugState((s) => ({ ...s, speed: e.target.value }))} />
+
+              <label style={{ fontSize: 12 }}>Zoom</label>
+              <input type="range" min="0.2" max="2" step="0.01" value={debugState.zoom} onChange={(e) => setDebugState((s) => ({ ...s, zoom: e.target.value }))} />
+
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button onClick={copyDebugToClipboard} style={{ flex: 1, padding: "8px 10px", borderRadius: 6, border: "none", cursor: "pointer" }}>Copy</button>
+                <button onClick={() => setDebugState({
+                  highlightColor: numToHex(debugScheme.highlightColor),
+                  midtoneColor: numToHex(debugScheme.midtoneColor),
+                  lowlightColor: numToHex(debugScheme.lowlightColor),
+                  baseColor: numToHex(debugScheme.baseColor),
+                  blurFactor: debugScheme.blurFactor,
+                  speed: debugScheme.speed,
+                  zoom: debugScheme.zoom,
+                })} style={{ padding: "8px 10px", borderRadius: 6, border: "none", cursor: "pointer" }}>Reset</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
