@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import NavbarLink from "./NavbarLink";
 import MenuToggleButton from "./MenuToggleButton";
+import IconButton from "./IconButton";
 import useSectionProgress from "../../hooks/useSectionProgress";
 
 export default function Navbar({
@@ -34,6 +36,86 @@ export default function Navbar({
     setBorderWidth(isTop ? "100%" : "0%");
   }, [activeSection, sectionProgress]);
 
+  // Mobile overlay ref and animations
+  const overlayRef = useRef(null);
+  const mobileTlRef = useRef({ intro: null, exit: null });
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const originalBodyOverflow = useRef(null);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = overlayRef.current;
+    if (!el) return;
+    const items = el.querySelectorAll('.mobile-nav-item');
+    const divider = el.querySelector('.mobile-nav-divider');
+
+  // determine open state early so we don't stomp animation start/end styles
+  // Nav overlay should open only when the internal menu is open. The
+  // external `isMobileOverlayOpen` refers to the project overlay and
+  // should not trigger the nav overlay; it only flips the toggle icon.
+  const open = isMenuOpen;
+
+    // ensure a clean slate
+    if (mobileTlRef.current.intro) {
+      try { mobileTlRef.current.intro.kill(); } catch (e) {}
+      mobileTlRef.current.intro = null;
+    }
+    if (mobileTlRef.current.exit) {
+      try { mobileTlRef.current.exit.kill(); } catch (e) {}
+      mobileTlRef.current.exit = null;
+    }
+
+    // starting styles: only apply when opening so we don't immediately hide
+    // elements during the close path (which caused instant disappearance).
+  if (open) {
+      if (divider) gsap.set(divider, { scaleX: 0, transformOrigin: 'left center', opacity: 0 });
+      if (items && items.length) gsap.set(items, { y: 20, opacity: 0 });
+      // ensure overlay starts hidden so intro can fade it in
+      if (el) gsap.set(el, { opacity: 0 });
+    }
+
+    // Intro timeline (open)
+    const intro = gsap.timeline({ paused: true });
+  // fade overlay in and then animate divider/items
+  if (el) intro.to(el, { opacity: 1, duration: 0.45, ease: 'power3.out' }, 0);
+  if (divider) intro.to(divider, { scaleX: 1, opacity: 1, duration: 0.45, ease: 'power3.out' }, 0.05);
+    if (items && items.length)
+      intro.to(items, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out' }, '-=0.25');
+
+    // Exit timeline (close) — slightly snappier and staggered in reverse order
+    const exit = gsap.timeline({ paused: true });
+    // softer exit: longer duration, gentle ease, reverse stagger from end
+    if (items && items.length)
+      exit.to(items, { y: 20, opacity: 0, duration: 0.7, stagger: { each: 0.08, from: 'end' }, ease: 'power3.inOut' }, 0);
+    if (divider) exit.to(divider, { scaleX: 0, opacity: 0, duration: 0.6, ease: 'power3.inOut' }, '-=0.2');
+
+    mobileTlRef.current.intro = intro;
+    mobileTlRef.current.exit = exit;
+
+  if (open) {
+      // show overlay then play intro
+      setOverlayVisible(true);
+      try { mobileTlRef.current.exit.pause(0); } catch (e) {}
+      intro.restart(true);
+    } else {
+      try { intro.pause(0); } catch (e) {}
+  // play exit then hide overlay when finished
+  // fade overlay out gradually, starting halfway through the text exit
+  if (el) exit.to(el, { opacity: 0, duration: 0.9, ease: 'power3.inOut' }, 0.35);
+      exit.restart(true);
+      exit.eventCallback('onComplete', () => {
+        setOverlayVisible(false);
+      });
+    }
+
+    return () => {
+      try { mobileTlRef.current.intro && mobileTlRef.current.intro.kill(); } catch (e) {}
+      try { mobileTlRef.current.exit && mobileTlRef.current.exit.kill(); } catch (e) {}
+      mobileTlRef.current.intro = null;
+      mobileTlRef.current.exit = null;
+    };
+  }, [isMenuOpen, isMobile, isMobileOverlayOpen]);
+
   // Keep the initial slow transition, then switch to normal speed after a
   // short delay (matches previous behaviour).
   useEffect(() => {
@@ -51,11 +133,45 @@ export default function Navbar({
   const handleToggleClick = () => {
     if (isMobileOverlayOpen) {
       setIsMobileOverlayOpen(false);
-      document.body.style.overflow = "auto"; // Unlock scroll when overlay closes
     } else {
       toggleMenu();
     }
   };
+
+  // Lock body scroll (and pause lenis/loco if available) while mobile menu is open.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const open = isMenuOpen || isMobileOverlayOpen;
+
+    // store original overflow the first time we open
+    if (open) {
+      if (originalBodyOverflow.current === null && document?.body) {
+        originalBodyOverflow.current = document.body.style.overflow || '';
+      }
+      if (document?.body) document.body.style.overflow = 'hidden';
+
+      // try to pause loco/lenis scrolling if available
+      if (locoScrollRef?.current) {
+        if (typeof locoScrollRef.current.stop === 'function') locoScrollRef.current.stop();
+        else if (typeof locoScrollRef.current.pause === 'function') locoScrollRef.current.pause();
+      }
+    } else {
+      // restore original overflow
+      if (document?.body) document.body.style.overflow = originalBodyOverflow.current || '';
+      originalBodyOverflow.current = null;
+
+      // try to resume loco/lenis scrolling if available
+      if (locoScrollRef?.current) {
+        if (typeof locoScrollRef.current.start === 'function') locoScrollRef.current.start();
+        else if (typeof locoScrollRef.current.resume === 'function') locoScrollRef.current.resume();
+      }
+    }
+
+    return () => {
+      // ensure we restore on unmount
+      if (document?.body) document.body.style.overflow = originalBodyOverflow.current || '';
+    };
+  }, [isMenuOpen, isMobileOverlayOpen, locoScrollRef]);
 
   // The toggle button is considered "open" if either menu OR overlay is open
   const isToggleOpen = isMenuOpen || isMobileOverlayOpen;
@@ -140,49 +256,154 @@ export default function Navbar({
         )}
       </nav>
 
-      {/* Mobile Fullscreen Menu Overlay */}
-      {isMobile && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "black",
-            color: "white",
-            opacity: isMenuOpen ? 1 : 0,
-            pointerEvents: isMenuOpen ? "auto" : "none",
-            transition: "opacity 0.5s ease",
-            zIndex: 999,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "2rem",
-          }}
-        >
-          <NavbarLink
-            href="#about"
-            originalText="about"
-            decryptedText="ABOUT"
-            locoScrollRef={locoScrollRef}
-            onClick={toggleMenu}
+  {/* Mobile Fullscreen Menu Overlay */}
+  {isMobile && (isMenuOpen || overlayVisible) && (
+    <div
+      ref={overlayRef}
+      style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "black",
+    color: "white",
+  // opacity and fading is handled by GSAP timelines so React shouldn't toggle it directly
+  opacity: 1,
+  // keep pointer events active while overlay is visible or animating
+  pointerEvents: (isMenuOpen || overlayVisible) ? "auto" : "none",
+    zIndex: 999,
+    display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "flex-start",
+      
+  paddingLeft: "4vw",
+  paddingRight: "4vw",
+  paddingTop: "6.5rem",
+      }}
+    >
+          <button
+            className="mobile-nav-item"
+            onClick={(e) => {
+              e.preventDefault();
+              if (locoScrollRef?.current) {
+                // ensure the scroller is running (in case we paused it while menu opened)
+                if (typeof locoScrollRef.current.start === 'function') locoScrollRef.current.start();
+                else if (typeof locoScrollRef.current.resume === 'function') locoScrollRef.current.resume();
+                const lenisDuration = 1.3;
+                const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+                locoScrollRef.current.scrollTo('#about', {
+                  offset: 0,
+                  duration: 0,
+                  easing: easeOutCubic,
+                });
+              }
+              toggleMenu();
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '3.8rem',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              padding: 0,
+              textAlign: 'left',
+            }}
+          >
+            ABOUT
+          </button>
+
+          <button
+            className="mobile-nav-item"
+            onClick={(e) => {
+              e.preventDefault();
+              if (locoScrollRef?.current) {
+                if (typeof locoScrollRef.current.start === 'function') locoScrollRef.current.start();
+                else if (typeof locoScrollRef.current.resume === 'function') locoScrollRef.current.resume();
+                
+                const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+                locoScrollRef.current.scrollTo('#projects', {
+                  offset: 0,
+                  duration: 0,
+                  easing: easeOutCubic,
+                });
+              }
+              toggleMenu();
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '3.8rem',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              padding: 0,
+              textAlign: 'left',
+            }}
+          >
+            PROJECTS
+          </button>
+
+          <button
+            className="mobile-nav-item"
+            onClick={(e) => {
+              e.preventDefault();
+              if (locoScrollRef?.current) {
+                if (typeof locoScrollRef.current.start === 'function') locoScrollRef.current.start();
+                else if (typeof locoScrollRef.current.resume === 'function') locoScrollRef.current.resume();
+                const lenisDuration = 1.3;
+                const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+                locoScrollRef.current.scrollTo('#contact', {
+                  offset: 0,
+                  duration: 0,
+                  easing: easeOutCubic,
+                });
+              }
+              toggleMenu();
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '3.8rem',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              padding: 0,
+              textAlign: 'left',
+            }}
+          >
+            CONTACT
+          </button>
+          {/* subtle gradient divider, 4vw inset on both sides via overlay padding */}
+          <div
+            className="mobile-nav-divider"
+            style={{
+              width: '100%',
+              height: '1px',
+              background: 'linear-gradient(to right, white, transparent)',
+              marginTop: '2.25rem',
+              transformOrigin: 'left center',
+            }}
           />
-          <NavbarLink
-            href="#projects"
-            originalText="projects"
-            decryptedText="PROJECTS"
-            locoScrollRef={locoScrollRef}
-            onClick={toggleMenu}
-          />
-          <NavbarLink
-            href="#contact"
-            originalText="contact"
-            decryptedText="CONTACT"
-            locoScrollRef={locoScrollRef}
-            onClick={toggleMenu}
-          />
+          {/* Social icons row below the divider (mobile) */}
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '0.75rem', marginTop: '2.25rem', alignItems: 'center' }}>
+            <IconButton
+              icon={<img src="/icons/linkedin.svg" alt="LinkedIn" />}
+              onClick={() => window.open('https://www.linkedin.com/in/quinttheissen', '_blank', 'noopener,noreferrer')}
+            />
+            <IconButton
+              icon={<img src="/icons/github.svg" alt="GitHub" />}
+              onClick={() => window.open('https://github.com/iqtheissen', '_blank', 'noopener,noreferrer')}
+            />
+          </div>
         </div>
       )}
     </>

@@ -259,22 +259,30 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
         )}
       </div>
 
-       {isMobile && showMobileOverlay && (
-  <div
-    style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'transparent',
-      zIndex: 9999,
-      overflow: 'auto',
-      animation: isMobileOverlayOpen
-        ? 'slideInRight 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards'
-        : 'slideOutRight 0.5s ease forwards',
-    }}
-  >
+      {isMobile && showMobileOverlay && (
+      <div
+        onWheel={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'transparent',
+          zIndex: 9999,
+          overflow: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+          overscrollBehavior: 'contain',
+          overscrollBehaviorY: 'contain',
+          animation: isMobileOverlayOpen
+            ? 'slideInRight 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+            : 'slideOutRight 0.5s ease forwards',
+        }}
+        // prevent scroll events from bubbling to the page/lenis scroller underneath
+      >
     <ProjectDisplay
       project={selectedProject}
       isMobile={isMobile}
