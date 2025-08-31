@@ -185,34 +185,7 @@ export default function Home() {
         <TargetCursor spinDuration={10} hideDefaultCursor={true} />
       )}
 
-      {/* Debug overlay: shows Lenis scrollY and section progress values */}
-      <div
-        style={{
-          position: "fixed",
-          left: 12,
-          top: 12,
-          zIndex: 99999,
-          background: "rgba(0,0,0,0.65)",
-          color: "#b7f5c6",
-          padding: "8px 10px",
-          fontSize: 12,
-          fontFamily: "Menlo, monospace",
-          borderRadius: 6,
-          pointerEvents: "none",
-          lineHeight: 1.4,
-        }}
-      >
-          
-          <div>hero→projects: {(heroToProjectsProgress || 0).toFixed(3)}</div>
-          <div>active: {String(activeSection)}</div>
-          <div>
-            sectionProg: {sectionProgress && sectionProgress[activeSection] != null ? sectionProgress[activeSection].toFixed(3) : "0.000"}
-          </div>
-          <div>assetsLoaded: {String(assetsLoaded)}</div>
-          <div>animationFinished: {String(animationFinished)}</div>
-          <div>loading: {String(loading)}</div>
-          <div>showLoading: {String(showLoading)}</div>
-      </div>
+  {/* Debug overlay removed for production/testing */}
       {showLoading && (
         <div
           style={{
