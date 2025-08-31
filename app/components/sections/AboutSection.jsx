@@ -277,8 +277,7 @@ export default function AboutSection({ progress, isMobile}) {
           position: 'relative',
           zIndex: 5,
           marginTop: isMobile ? '18vh' : 0,
-          paddingLeft: isMobile ? '4vw' : 0,
-          paddingRight: isMobile ? '4vw' : 0,
+          
           marginLeft: 0,
           marginRight: isMobile ? 0 : '3vw',
         }}
