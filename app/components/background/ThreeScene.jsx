@@ -27,6 +27,7 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
   useEffect(() => {
     let composer, torus;
     let resizeObserver;
+    let mouseMoveHandler = null;
 
     const initScene = async () => {
       const Main = await import("../../init/init");
@@ -71,9 +72,9 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
       const hBlurPass = new ShaderPass(horizontalBlurShader);
       const vBlurPass = new ShaderPass(verticalBlurShader);
 
-      // Set initial blur strength based on current resolution
-      hBlurPass.uniforms.h.value = 1.0 / window.innerWidth;
-      vBlurPass.uniforms.v.value = 1.0 / window.innerHeight;
+  // Set initial blur strength based on current resolution (use safe fallback)
+  hBlurPass.uniforms.h.value = 1.0 / Math.max(1, window.innerWidth);
+  vBlurPass.uniforms.v.value = 1.0 / Math.max(1, window.innerHeight);
 
       composer.addPass(hBlurPass);
       composer.addPass(vBlurPass);
@@ -84,11 +85,20 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
       const resize = () => {
         const width = Math.max(1, container.clientWidth);
         const height = Math.max(1, container.clientHeight);
+
         const dpr = window.devicePixelRatio || 1;
 
-        // Use devicePixelRatio for the drawing buffer to avoid clipping / low-res
-        const bufferW = Math.floor(width * dpr);
-        const bufferH = Math.floor(height * dpr);
+        // Compute resolution scaling at runtime (don't rely on the prop capture)
+        const isMobileNow = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+        const resolutionScale = isMobileNow ? 0.5 : 1;
+
+        // Cap DPR to avoid huge buffers on high-DPI devices; allow slightly higher DPR on desktop
+        const maxDpr = isMobileNow ? 1 : 1.5;
+        const effectiveDpr = Math.min(maxDpr, Math.max(0.5, dpr * resolutionScale));
+
+        // Use devicePixelRatio for the drawing buffer but scaled down
+        const bufferW = Math.floor(width * effectiveDpr);
+        const bufferH = Math.floor(height * effectiveDpr);
 
         canvas.width = bufferW;
         canvas.height = bufferH;
@@ -96,8 +106,8 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
         // Update shader uniform with buffer size
         torus.material.uniforms.uResolution.value.set(bufferW, bufferH);
 
-        // Renderer and composer sizes: GL size uses CSS size + DPR; composer uses buffer size
-        Main.gl.setPixelRatio(dpr);
+        // Renderer and composer sizes: GL size uses CSS size + effective DPR; composer uses buffer size
+        Main.gl.setPixelRatio(effectiveDpr);
         Main.gl.setSize(width, height, false);
         composer.setSize(bufferW, bufferH);
 
@@ -112,7 +122,8 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
       resizeObserver = new ResizeObserver(resize);
       resizeObserver.observe(container);
 
-      const onMouseMove = (e) => {
+      // keep handler reference in outer scope so cleanup can remove it reliably
+      mouseMoveHandler = (e) => {
         const rect = canvas.getBoundingClientRect();
 
         const inside =
@@ -131,7 +142,7 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
 
         mousePos.current.set(ndcX, ndcY);
       };
-      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mousemove", mouseMoveHandler);
 
       const clock = new THREE.Clock();
       let first = true;
@@ -170,11 +181,12 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
     torus.material.uniforms.uMouseDistance.value = 9999;
   }
 
-  // Blur intensity based on progress
-const blurStrength = progressRef.current * 3.0;
-
-hBlurPass.uniforms.h.value = blurStrength / window.innerWidth;
-vBlurPass.uniforms.v.value = blurStrength / window.innerHeight;
+  // Blur intensity based on progress and buffer sizes (use canvas pixel buffer if available)
+  const blurStrength = progressRef.current * 3.0;
+  const bufW = canvas ? (canvas.width || window.innerWidth) : window.innerWidth;
+  const bufH = canvas ? (canvas.height || window.innerHeight) : window.innerHeight;
+  hBlurPass.uniforms.h.value = blurStrength / Math.max(1, bufW);
+  vBlurPass.uniforms.v.value = blurStrength / Math.max(1, bufH);
 
   // --- Modify camera distance here ---         // Set this to your starting camera z-position
   const minDistance = 2;       // Closest camera distance
@@ -204,7 +216,7 @@ vBlurPass.uniforms.v.value = blurStrength / window.innerHeight;
 
     return () => {
       resizeObserver?.disconnect();
-      window.removeEventListener("mousemove", onMouseMove);
+      if (mouseMoveHandler) window.removeEventListener("mousemove", mouseMoveHandler);
     };
   }, [onLoaded]);
 
