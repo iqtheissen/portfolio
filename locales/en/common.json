@@ -1,0 +1,58 @@
+{
+  "nav": { "contact": "contact", "projects": "projects", "about": "about" },
+  "hero": {
+    "hi": "Hi I'm",
+    "firstName": "Quint",
+    "lastName": "Theissen",
+    "titleLine1": "CREATIVE",
+    "titleLine2": "DEVELOPER",
+    "rotatingWords": ["DESIGN", "WEBSITES", "GAMES"]
+  },
+  "about": {
+    "title": "ABOUT",
+    "experiences": [
+      {
+        "title": "MBO Software Developer",
+        "company": "MBO Utrecht",
+        "period": "Aug 2019 – June 2022",
+        "location": "Utrecht, Netherlands",
+        "description": "Completed a vocational program in Software Development, gaining a foundation in front-end, PHP-based back-end development, and game development. Built practical projects in web and game applications, collaborating in agile team environments and applying version control and modern programming practices."
+      },
+      {
+        "title": "Software Development Intern",
+        "company": "AXiS Digitaal",
+        "period": "Aug 2022 – May 2023",
+        "location": "Nieuwegein, Netherlands",
+        "description": "Worked on Unity game development using C# and WordPress-based web projects. Assisted in managing partner relationships and conducted client interviews to gather requirements. Collaborated with the development team to deliver practical solutions and gain hands-on experience in both software and client-facing processes."
+      },
+      {
+        "title": "Junior Software Developer",
+        "company": "AXiS Digitaal",
+        "period": "May 2023 – Dec 2023",
+        "location": "Nieuwegein, Netherlands",
+        "description": "Designed a website for the gaming brand AXiS Gameforce and created a GUI for a data entry application. Oversaw a team of interns on WordPress projects and took on increased responsibility in project management. Developed an educational web-based game for children, working closely with international clients to meet their needs."
+      },
+      {
+        "title": "AD Software Developer",
+        "company": "Hogeschool Utrecht",
+        "period": "Aug 2024 – Current",
+        "location": "Amersfoort, Netherlands",
+        "description": "Collaborated in an agile team environment with fellow students, developing multiple applications across Java and C#. Projects included a CLI application for managing patient data, a JavaFX public transport app for assisting people with autism, a C# public transport dashboard for a real client, and a flashcard game for learning programming terms. Gained hands-on experience in project management, teamwork, and delivering functional software solutions."
+      }
+    ],
+    "text": [
+      "I am a passionate software developer with a solid foundation in front-end, PHP-based back-end development, and game development. Throughout my education at MBO Utrecht and hands-on experiences at AXiS Digitaal and Hogeschool Utrecht, I have gained practical expertise in building web, mobile, and desktop applications across a variety of technologies, including Java, C#, JavaFX, Unity, React Native, and WordPress.",
+      "I thrive in collaborative, agile team environments, having led interns, worked directly with clients, and contributed to real-world projects ranging from educational games and public transport applications to dashboards and data management tools. My work blends technical skill with creativity, a keen eye for user experience, and a focus on delivering practical solutions that make an impact.",
+      "Driven by curiosity and continuous learning, I enjoy tackling complex problems, exploring new technologies, and creating software that is both functional and engaging."
+    ],
+    "downloadCV": "Download CV"
+  },
+  "projects": {
+    "title": "WORK",
+    "description": "Description",
+    "year": "Year",
+    "goal": "Goal",
+    "status": "Status",
+    "viewProject": "VIEW PROJECT"
+  }
+}

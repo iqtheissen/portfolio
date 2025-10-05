@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import TechTag from './TechTag';
 import CyberButton from './CyberButton';
 
@@ -8,6 +9,7 @@ export default function ProjectInfoPanel({
   onRevealComplete,
   animateReveal = true,
 }) {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function ProjectInfoPanel({
       last.removeEventListener('animationend', handler);
       clearTimeout(fallback);
     };
-  }, [project && project.name, hoverDirection, onRevealComplete]);
+  }, [project, hoverDirection, onRevealComplete]);
 
   return (
     <div
@@ -68,6 +70,7 @@ export default function ProjectInfoPanel({
         gap: '3rem',
         overflowY: 'auto',
       }}
+      data-project-title={project.title}
     >
       {/* Title */}
       <h1 data-reveal style={{ margin: 0, textTransform: 'uppercase' }}>{project.title}</h1>
@@ -91,25 +94,25 @@ export default function ProjectInfoPanel({
 
       {/* Description */}
       <div data-reveal>
-        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>Description</strong>
+        <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{t('projects.description')}</strong>
         <p style={{ marginTop: 0 }}>{project.description}</p>
       </div>
 
       {/* Year & Goal */}
       <div data-reveal style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: '150px' }}>
-          <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Year</strong>
+          <strong style={{ display: 'block', marginBottom: '0.2rem' }}>{t('projects.year')}</strong>
           <div>{project.year}</div>
         </div>
         <div style={{ flex: 2, minWidth: '200px' }}>
-          <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Goal</strong>
+          <strong style={{ display: 'block', marginBottom: '0.2rem' }}>{t('projects.goal')}</strong>
           <div>{project.goal}</div>
         </div>
       </div>
 
       {/* Status */}
       <div data-reveal>
-        <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Status</strong>
+        <strong style={{ display: 'block', marginBottom: '0.2rem' }}>{t('projects.status')}</strong>
         <div>{project.status}</div>
       </div>
 
@@ -122,9 +125,9 @@ export default function ProjectInfoPanel({
             fontSize: '1.2rem',
           }}
           tag="f-67"
-          decryptedText="VIEW PROJECT"
+          decryptedText={t('projects.viewProject')}
         >
-          view project
+          {t('projects.viewProject').toLowerCase()}
         </CyberButton>
       </div>
 

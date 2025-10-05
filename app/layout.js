@@ -1,6 +1,7 @@
 import { Anaheim } from "next/font/google";
 import { Anybody } from "next/font/google";
 import "./globals.css";
+import I18nextClientProvider from "./providers/I18nextProvider";
 
 
 const anaheim = Anaheim({
@@ -25,8 +26,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       
       <body className={anybody.className}>
-        
-        {children}
+        <I18nextClientProvider>
+          {children}
+        </I18nextClientProvider>
       </body>
     </html>
   );

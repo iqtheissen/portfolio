@@ -1,20 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import ProjectList from '../ui/ProjectList';
 import ProjectDisplay from '../ui/ProjectDisplay';
-import projects from '../../data/projects.json';
-
+import { useProjects } from '../../hooks/useProjects';
+import { useTranslation } from 'react-i18next';
 
 import SectionHeader from '../ui/SectionHeader';
 
 export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen, setIsMobileOverlayOpen, selectedProject: parentSelectedProject, onProjectChange }) {
-  const [selectedProject, setSelectedProject] = useState(parentSelectedProject || projects[0]);
+  const { t } = useTranslation();
+  const projects = useProjects();
+    const [selectedProject, setSelectedProject] = useState(parentSelectedProject || null);
+
+  // Set initial selected project when projects load
+  useEffect(() => {
+    if (!selectedProject && projects.length > 0) {
+      setSelectedProject(projects[0]);
+    }
+  }, [projects, selectedProject]);
+
+  // Update selected project when projects data changes (language switch)
+  useEffect(() => {
+    if (selectedProject && projects.length > 0) {
+      const currentProject = projects.find(p => p.name === selectedProject.name);
+      if (currentProject && currentProject !== selectedProject) {
+        setSelectedProject(currentProject);
+      }
+    }
+  }, [projects, selectedProject]);
 
   // Sync with parent-controlled selected project
   useEffect(() => {
-    if (parentSelectedProject && parentSelectedProject.name !== selectedProject.name) {
-      setSelectedProject(parentSelectedProject);
+    if (parentSelectedProject && projects.length > 0) {
+      const matchingProject = projects.find(p => p.name === parentSelectedProject.name);
+      if (matchingProject && matchingProject.name !== selectedProject?.name) {
+        setSelectedProject(matchingProject);
+      }
     }
-  }, [parentSelectedProject]);
+  }, [parentSelectedProject, projects]);
   const [currentProject, setCurrentProject] = useState(projects[0]);
   const [nextProject, setNextProject] = useState(null);
   const [isSwapping, setIsSwapping] = useState(false);
@@ -24,8 +46,20 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
   const [showMobileOverlay, setShowMobileOverlay] = useState(false);
   const [isMobileOverlayVisible, setIsMobileOverlayVisible] = useState(false);
 
+  // Update currentProject when language changes (for desktop view)
+  useEffect(() => {
+    if (currentProject && projects.length > 0) {
+      const updatedCurrentProject = projects.find(p => p.name === currentProject.name);
+      if (updatedCurrentProject && updatedCurrentProject !== currentProject) {
+        setCurrentProject(updatedCurrentProject);
+      }
+    }
+  }, [projects, currentProject]);
+
   const handleSelect = (project) => {
-    if (project.name === selectedProject.name || isSwapping) return;
+    // On mobile, allow reselecting the current project to reopen overlay
+    // On desktop, prevent selecting the same project
+    if ((!isMobile && project.name === selectedProject.name) || isSwapping) return;
 
     const currentIdx = projects.findIndex(p => p.name === selectedProject.name);
     const nextIdx = projects.findIndex(p => p.name === project.name);
@@ -110,6 +144,16 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
   }
 }, [isMobileOverlayOpen]);
 
+  // Reset animation states when mobile overlay closes to prevent stuck animations
+  useEffect(() => {
+    if (!isMobileOverlayOpen && isMobile) {
+      setIsSwapping(false);
+      setNextProject(null);
+      setHoveredProjectName(null);
+      setHoverDirection(null);
+    }
+  }, [isMobileOverlayOpen, isMobile]);
+
   return (
     <section
       id="projects"
@@ -123,7 +167,7 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
       }}
     >
       <SectionHeader
-        title="WORK"
+        title={t('projects.title')}
         sectionId="projects"
         progress={progress}
         fromLeft={true}
@@ -139,7 +183,7 @@ export default function ProjectSection({ progress, isMobile, isMobileOverlayOpen
           marginTop: isMobile ? 0 : 'calc(8vh + 12px + 2rem)',
           height: 'calc(100vh - (8vh + 12px + 2rem))',
           display: 'flex',
-          padding: '2rem',
+          padding: isMobile ? '0 4vw' : '2rem',
           boxSizing: 'border-box',
           gap: '5rem',
           position: 'relative',

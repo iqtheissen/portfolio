@@ -6,6 +6,8 @@ import NavbarLink from "./NavbarLink";
 import MenuToggleButton from "./MenuToggleButton";
 import IconButton from "./IconButton";
 import useSectionProgress from "../../hooks/useSectionProgress";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar({
   locoScrollRef,
@@ -19,6 +21,7 @@ export default function Navbar({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [atTop, setAtTop] = useState(true);
   const normalTransitionSpeed = "0.7s";
+  const { t, i18n } = useTranslation();
 
   // Use ScrollTrigger-driven section progress to determine whether we're
   // at the top of the page. When the active section is 'hero' and its
@@ -204,29 +207,34 @@ export default function Navbar({
         {!isMobile && (
           <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: atTop ? "2rem" : "0", transition: `gap ${transitionSpeed} ease` }}>
             <NavbarLink
+              key={`nav-about-${i18n.language}`}
               href="#about"
-              originalText="about"
-              decryptedText="ABOUT"
+              originalText={t("nav.about")}
+              decryptedText={t("nav.about").toUpperCase()}
               locoScrollRef={locoScrollRef}
             />
 
             <span aria-hidden style={{ color: "rgba(255,255,255,0.65)", opacity: atTop ? 0 : 0.65, transform: atTop ? "translateY(-4px) scale(0.9)" : "translateY(0) scale(1)", transition: `opacity 300ms ease, transform 300ms ease` }}>/</span>
 
             <NavbarLink
+              key={`nav-projects-${i18n.language}`}
               href="#projects"
-              originalText="projects"
-              decryptedText="PROJECTS"
+              originalText={t("nav.projects")}
+              decryptedText={t("nav.projects").toUpperCase()}
               locoScrollRef={locoScrollRef}
             />
 
             <span aria-hidden style={{ color: "rgba(255,255,255,0.65)", opacity: atTop ? 0 : 0.65, transform: atTop ? "translateY(-4px) scale(0.9)" : "translateY(0) scale(1)", transition: `opacity 300ms ease, transform 300ms ease` }}>/</span>
 
             <NavbarLink
+              key={`nav-contact-${i18n.language}`}
               href="#contact"
-              originalText="contact"
-              decryptedText="CONTACT"
+              originalText={t("nav.contact")}
+              decryptedText={t("nav.contact").toUpperCase()}
               locoScrollRef={locoScrollRef}
             />
+
+            <LanguageSwitcher className="cursor-target" style={{ marginLeft: atTop ? "2rem" : "1rem", transition: `margin-left ${transitionSpeed} ease` }} isMobile={isMobile} />
           </div>
         )}
 
@@ -314,7 +322,7 @@ export default function Navbar({
               textAlign: 'left',
             }}
           >
-            ABOUT
+            {t("nav.about").toUpperCase()}
           </button>
 
           <button
@@ -347,7 +355,7 @@ export default function Navbar({
               textAlign: 'left',
             }}
           >
-            PROJECTS
+            {t("nav.projects").toUpperCase()}
           </button>
 
           <button
@@ -365,24 +373,24 @@ export default function Navbar({
                   easing: easeOutCubic,
                 });
               }
-              toggleMenu();
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'white',
-              fontSize: '3.8rem',
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-              lineHeight: 1,
-              textTransform: 'uppercase',
-              padding: 0,
-              textAlign: 'left',
-            }}
-          >
-            CONTACT
-          </button>
-          {/* subtle gradient divider, 4vw inset on both sides via overlay padding */}
+                toggleMenu();
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                fontSize: '3.8rem',
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                lineHeight: 1,
+                textTransform: 'uppercase',
+                padding: 0,
+                textAlign: 'left',
+              }}
+              >
+              {t("nav.contact").toUpperCase()}
+              </button>
+              {/* subtle gradient divider, 4vw inset on both sides via overlay padding */}
           <div
             className="mobile-nav-divider"
             style={{

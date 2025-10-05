@@ -24,7 +24,7 @@ export default function ProjectDisplay({
     // reset when project changes
     setImagesDone(false);
     setInfoDone(false);
-  }, [project && project.name]);
+  }, [project]);
 
   // If this display should not animate (outgoing/current view), mark children done immediately
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function ProjectDisplay({
       setImagesDone(true);
       setInfoDone(true);
     }
-  }, [animateReveal, project && project.name]);
+  }, [animateReveal, project]);
 
   useEffect(() => {
     if (imagesDone && infoDone && typeof onRevealComplete === 'function') {
@@ -48,7 +48,7 @@ export default function ProjectDisplay({
         flexDirection: isMobile ? 'column' : 'row',
         height: '100%',
         gap: isMobile ? '2rem' : '8rem',
-        padding: '2rem',
+        padding: isMobile ? '4vw' : '2rem',
         marginTop: isMobile ? '4rem' : '0',
         position: 'relative',
         boxSizing: 'border-box',
@@ -84,7 +84,13 @@ export default function ProjectDisplay({
     <ProjectImageGrid images={images} hoverDirection={hoverDirection} onRevealComplete={() => setImagesDone(true)} animateReveal={animateReveal} disableInteractions={disableInteractions} />
       </div>
       <div style={{ width: isMobile ? '100%' : '50%' }}>
-  <ProjectInfoPanel project={project} hoverDirection={hoverDirection} onRevealComplete={() => setInfoDone(true)} animateReveal={animateReveal} disableInteractions={disableInteractions} />
+  <ProjectInfoPanel 
+    project={project} 
+    hoverDirection={hoverDirection} 
+    onRevealComplete={() => setInfoDone(true)} 
+    animateReveal={animateReveal} 
+    disableInteractions={disableInteractions} 
+  />
       </div>
     </div>
   );

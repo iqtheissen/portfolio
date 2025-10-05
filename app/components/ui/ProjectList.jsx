@@ -50,16 +50,16 @@ function ProjectListItem({
     <React.Fragment>
       <div
         className={isSelected ? '' : (disabled ? '' : 'cursor-target')}
-        onClick={() => { if (!disabled && !isSelected) onSelect?.(project); }}
+        onClick={() => { if (!disabled && (!isSelected || isMobile)) onSelect?.(project); }}
         onMouseEnter={() => {
-          if (!disabled && !isSelected) {
+          if (!disabled && !isSelected && !isMobile) {
             setIsHover(true);
             startAnimation(); // hover: temporary uppercase
             onHover?.(project.name);
           }
         }}
         onMouseLeave={() => {
-          if (!disabled && !isSelected) {
+          if (!disabled && !isSelected && !isMobile) {
             setIsHover(false);
             resetText();
             onHoverEnd?.();
@@ -156,7 +156,7 @@ export default function ProjectList({
         width: isMobile ? '100%' : '200px',
         height: '100%',
         position: 'relative',
-        padding: isMobile ? `0 1rem` : '0 1rem 0 2rem',
+        padding: isMobile ? '0 0' : '0 1rem 0 2rem',
         zIndex: 5,
         display: 'flex',
         justifyContent: isMobile ? 'center' : 'flex-start',
@@ -170,19 +170,20 @@ export default function ProjectList({
           gap: isMobile ? `${mobileGap}px` : '1.5rem',
           transition: isMobile ? 'gap 0.1s ease-out' : 'none',
           margin: isMobile ? 'auto' : 'auto 0',
-          width: isMobile ? '75vw' : '100%',
-          maxWidth: isMobile ? '75vw' : 'unset',
+          width: isMobile ? '100%' : '100%',
+          maxWidth: isMobile ? '100%' : 'unset',
           position: 'relative',
         }}
       >
   {projects.map((project, idx) => {
           const isSelected = project.name === selectedProjectName;
+          const isVisuallySelected = isMobile || isSelected; // On mobile, all projects appear selected
 
           // Base styles
           const itemBaseStyle = {
             display: 'block',
             width: '100%',
-            color: isSelected ? 'white' : 'grey',
+            color: isVisuallySelected ? 'white' : 'grey',
             fontSize: isMobile ? '1.2rem' : '1.1rem',
             fontWeight: 500,
             whiteSpace: 'nowrap',
@@ -260,7 +261,7 @@ export default function ProjectList({
           // Divider style with animation (mobile only)
           const dividerStyle = {
             height: '1px',
-            width: animationPhase !== 'idle' && isMobile ? 0 : '75vw',
+            width: animationPhase !== 'idle' && isMobile ? 0 : '100%',
             background: 'darkgrey',
             opacity: animationPhase !== 'idle' && isMobile ? 0 : 1,
             transition: 'width 0.6s ease, opacity 0.6s ease',
@@ -276,7 +277,7 @@ export default function ProjectList({
               <ProjectListItem
                 project={project}
                 idx={idx}
-                isSelected={isSelected}
+                isSelected={isVisuallySelected}
                 disabled={disabled}
                 isMobile={isMobile}
                 animationStyles={animationStyles}

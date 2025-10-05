@@ -3,19 +3,20 @@
 import React, { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 import CyberButton from "../ui/CyberButton";
 import IconButton from "../ui/IconButton";
 import DrawText from "../ui/DrawText";
 
-const ROTATING_WORDS = ["DESIGN", "WEBSITES", "GAMES"];
-
 function wait(ms) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
 export default function HeroSection({ startAnimation, isMobile, progress = 0 }) {
+  const { t } = useTranslation();
+  const ROTATING_WORDS_TRANSLATED = t('hero.rotatingWords', { returnObjects: true });
   const heroRef = useRef(null);
   const hiRef = useRef(null);
   const nameRef = useRef(null);
@@ -42,7 +43,7 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
         setDrawProgress(0); // undraw current word
         await wait(1800);
 
-        index = (index + 1) % ROTATING_WORDS.length;
+        index = (index + 1) % ROTATING_WORDS_TRANSLATED.length;
         setActiveIndex(index);
 
         // Draw new word
@@ -236,7 +237,7 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
         data-scroll-speed="-3"
       >
         <div ref={hiRef} style={{ fontSize: isMobile ? "0.9rem" : "1.1rem", color: "#b0b0b0", fontWeight: 300 }}>
-          Hi I&apos;m
+          {t('hero.hi')}
         </div>
 
         <div
@@ -249,8 +250,8 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
           }}
           ref={nameRef}
         >
-          <span style={{ color: "white" }}>Quint</span>
-          <span style={{ color: "#b0b0b0" }}>Theissen</span>
+          <span style={{ color: "white" }}>{t('hero.firstName')}</span>
+          <span style={{ color: "#b0b0b0" }}>{t('hero.lastName')}</span>
         </div>
 
         <div
@@ -264,15 +265,15 @@ export default function HeroSection({ startAnimation, isMobile, progress = 0 }) 
             textTransform: "uppercase",
           }}
         >
-          <div ref={titleLine1Ref} style={{ display: 'block' }}>CREATIVE</div>
-          <div ref={titleLine2Ref} style={{ display: 'block' }}>DEVELOPER</div>
+          <div ref={titleLine1Ref} style={{ display: 'block' }}>{t('hero.titleLine1')}</div>
+          <div ref={titleLine2Ref} style={{ display: 'block' }}>{t('hero.titleLine2')}</div>
         </div>
 
   <div ref={rotatingRef} style={{ marginTop: isMobile ? "-0.5rem" : "-1.25rem", position: "relative", height: isMobile ? 3.8 * 16 * 1.2 : 6.5 * 16 * 1.2 }}>
           {/* 1rem = 16px, so 3.8rem = 60.8px, 6.5rem = 104px */}
-          {ROTATING_WORDS.map((word, i) => (
+          {ROTATING_WORDS_TRANSLATED.map((word, i) => (
             <div
-              key={word}
+              key={i}
               style={{
                 position: i === activeIndex ? "relative" : "absolute",
                 opacity: i === activeIndex ? 1 : 0,

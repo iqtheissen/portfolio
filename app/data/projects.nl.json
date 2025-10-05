@@ -1,0 +1,68 @@
+[
+  {
+    "name": "pijnwerk",
+    "title": "Pijnwerk",
+    "description": "Website voor een paardencoachingsbedrijf, inclusief logo en webdesign. Doel is om een informatieve website te creëren waar mensen kunnen leren over deze nieuwe methode van Paarden Coaching en contact kunnen opnemen om sessies te boeken.",
+    "tags": ["website", "design", "branding", "next.js", "react", "ui/ux"],
+    "year": 2025,
+    "status": "In Uitvoering",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Creëer een informatieve en visueel aantrekkelijke website waar mensen kunnen leren over Paarden Coaching en gemakkelijk contact kunnen opnemen om sessies te boeken."
+  },
+  {
+    "name": "habitica",
+    "title": "Habitica Quest Generator",
+    "description": "Een extensie voor de productiviteitsapp Habitica, die AI gebruikt om je takenlijst-items om te zetten in RPG-geïnspireerde quests.",
+    "tags": ["javascript", "api", "ai", "prompt-engineering", "extension", "frontend"],
+    "year": 2025,
+    "status": "In Uitvoering",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Verbeter productiviteit door dagelijkse taken te gamificeren en ze om te zetten in boeiende RPG-stijl quests binnen Habitica."
+  },
+  {
+    "name": "truthfairies",
+    "title": "Truthfairies INC",
+    "description": "Website gebouwd voor een sjamanistische coachingsbedrijf. Hielp bij het creëren van een merkidentiteit en ontwikkelde een gedurfde moderne website vanaf nul om nieuwe klanten te bereiken.",
+    "tags": ["next.js", "javascript", "frontend", "branding", "website", "react", "ui/ux"],
+    "year": 2025,
+    "status": "In Uitvoering",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Bereik nieuwe klanten door een gedurfde, moderne website te creëren met een sterke merkidentiteit."
+  },
+  {
+    "name": "tapper",
+    "title": "Coca Cola Tapper",
+    "description": "Hypothetische Coca-Cola gebrande versie van het klassieke arcadespel Tapper.",
+    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "year": 2021,
+    "status": "Concept",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Hercrieer het klassieke Tapper arcadespel met Coca-Cola branding als een creatieve design- en ontwikkelopgave."
+  },
+  {
+    "name": "phunics",
+    "title": "Phunics Woordspel",
+    "description": "Een leuk foniek-gebaseerd woordspel voor leerlingen.",
+    "tags": ["education", "game", "phonics"],
+    "year": 2023,
+    "status": "In Uitvoering",
+    "projectLink": "https://phunics.io",
+    "githubLink": "https://github.com/yourname/phunics",
+    "goal": "Maak het leren van foniek leuk en boeiend door middel van een interactief woordspel."
+  },
+  {
+    "name": "recoilrampage",
+    "title": "Recoil Rampage",
+    "description": "⚡ (Details nodig — genre, doel, en tech stack).",
+    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "year": 2021,
+    "status": "In Uitvoering",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Creëer een snel actie spel gefocust op terugslag mechanics, gecombineerd met pixel art, muziek, en boeiende gameplay."
+  }
+]
