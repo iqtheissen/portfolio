@@ -117,19 +117,21 @@ export default function ProjectInfoPanel({
       </div>
 
       {/* View Project Button */}
-      <div data-reveal style={{ marginTop: '2rem' }}>
-        <CyberButton
-          href={project.url}
-          style={{
-            padding: '1rem 2rem',
-            fontSize: '1.2rem',
-          }}
-          tag="f-67"
-          decryptedText={t('projects.viewProject')}
-        >
-          {t('projects.viewProject').toLowerCase()}
-        </CyberButton>
-      </div>
+      {project.projectLink && (
+        <div data-reveal style={{ marginTop: '2rem' }}>
+          <CyberButton
+            href={project.projectLink}
+            style={{
+              padding: '1rem 2rem',
+              fontSize: '1.2rem',
+            }}
+            tag="f-67"
+            decryptedText={t('projects.viewProject')}
+          >
+            {t('projects.viewProject').toLowerCase()}
+          </CyberButton>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes revealItem {
