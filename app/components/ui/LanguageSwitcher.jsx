@@ -13,20 +13,9 @@ export default function LanguageSwitcher({ className, style, isMobile = false })
   const setLang = async (lng) => {
     if (i18n.language === lng) return;
     
-    if (!isMobile) {
-      // Desktop: smooth fade effect
-      setTargetLanguage(lng);
-      setFadeState('fading-in');
-    } else {
-      // Mobile: change language immediately
-      try {
-        await i18n.changeLanguage(lng);
-        localStorage.setItem("locale", lng);
-        setIsOpen(false);
-      } catch (e) {
-        console.warn("i18n changeLanguage failed", e);
-      }
-    }
+    // Smooth fade effect for both desktop and mobile
+    setTargetLanguage(lng);
+    setFadeState('fading-in');
   };
 
   // Handle fade completion and language change
@@ -81,23 +70,21 @@ export default function LanguageSwitcher({ className, style, isMobile = false })
 
   return (
     <>
-      {/* Smooth fade to black overlay - desktop only */}
-      {!isMobile && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'black',
-            opacity: fadeState === 'idle' ? 0 : fadeState === 'fading-out' ? 0 : 1,
-            transition: 'opacity 0.3s ease-in-out',
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+      {/* Smooth fade to black overlay */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'black',
+          opacity: fadeState === 'idle' ? 0 : fadeState === 'fading-out' ? 0 : 1,
+          transition: 'opacity 0.3s ease-in-out',
+          zIndex: 9999,
+          pointerEvents: 'none',
+        }}
+      />
 
       <div className={className} style={{ position: 'relative', ...style }} ref={dropdownRef}>
       <button

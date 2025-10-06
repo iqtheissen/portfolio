@@ -201,7 +201,9 @@ export default function Navbar({
       >
         
         {isMobile && (
-          <div style={{ position: "relative", zIndex: 2, fontWeight: "bold", fontSize: "1.2rem" }}></div>
+          <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: "1rem" }}>
+            <LanguageSwitcher isMobile={isMobile} />
+          </div>
         )}
 
         {!isMobile && (
