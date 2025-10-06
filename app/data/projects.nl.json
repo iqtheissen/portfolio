@@ -2,67 +2,67 @@
   {
     "name": "pijnwerk",
     "title": "Pijnwerk",
-    "description": "Website voor een paardencoachingsbedrijf, inclusief logo en webdesign. Doel is om een informatieve website te creëren waar mensen kunnen leren over deze nieuwe methode van Paarden Coaching en contact kunnen opnemen om sessies te boeken.",
+    "description": "Website voor het paardencoachingsbedrijf Pijnwerk, inclusief logo en webdesign.",
     "tags": ["website", "design", "branding", "next.js", "react", "ui/ux"],
     "year": 2025,
     "status": "In Uitvoering",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Creëer een informatieve en visueel aantrekkelijke website waar mensen kunnen leren over Paarden Coaching en gemakkelijk contact kunnen opnemen om sessies te boeken."
+    "goal": "Het maken van een informatieve en mooie moderne website waar mensen kunnen leren over deze nieuwe methode van paardencoaching, en gemakkelijk contact kunnen opnemen om sessies te boeken."
   },
   {
     "name": "habitica",
-    "title": "Habitica Quest Generator",
-    "description": "Een extensie voor de productiviteitsapp Habitica, die AI gebruikt om je takenlijst-items om te zetten in RPG-geïnspireerde quests.",
+    "title": "Quest Generator",
+    "description": "Een extensie voor de productiviteitsapp Habitica, die AI gebruikt om je takenlijst-items om te zetten in RPG-style quests.",
     "tags": ["javascript", "api", "ai", "prompt-engineering", "extension", "frontend"],
     "year": 2025,
     "status": "In Uitvoering",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Verbeter productiviteit door dagelijkse taken te gamificeren en ze om te zetten in boeiende RPG-stijl quests binnen Habitica."
+    "goal": "Verbeter productiviteit door dagelijkse taken te gamificeren en ze om te zetten in RPG-style quests binnen Habitica."
   },
   {
     "name": "truthfairies",
     "title": "Truthfairies INC",
-    "description": "Website gebouwd voor een sjamanistische coachingsbedrijf. Hielp bij het creëren van een merkidentiteit en ontwikkelde een gedurfde moderne website vanaf nul om nieuwe klanten te bereiken.",
+    "description": "Een website en brand identity voor het sjamanistische coachingsbedrijf Truth Fairies INC. Ik heb geholpen bij het creëren van deze merkidentiteit, en een proof of concept gecodeerd voor een moderne, flashy website.",
     "tags": ["next.js", "javascript", "frontend", "branding", "website", "react", "ui/ux"],
     "year": 2025,
     "status": "In Uitvoering",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Bereik nieuwe klanten door een gedurfde, moderne website te creëren met een sterke merkidentiteit."
+    "goal": "Een salesfunnel creëren met een moderne, aantrekkelijke website die nieuwe klanten aantrekt en hen aanmoedigt om contact op te nemen voor sessies."
   },
   {
     "name": "tapper",
     "title": "Coca Cola Tapper",
-    "description": "Hypothetische Coca-Cola gebrande versie van het klassieke arcadespel Tapper.",
+    "description": "Een Coca-Cola gebrande versie van het klassieke arcadespel Tapper, gemaakt in mijn tijd bij MBO Utrecht.",
     "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
     "year": 2021,
     "status": "Concept",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Hercrieer het klassieke Tapper arcadespel met Coca-Cola branding als een creatieve design- en ontwikkelopgave."
+    "goal": "Een game maken voor een fictieve reclamecampagne voor Coca-Cola."
   },
   {
     "name": "phunics",
-    "title": "Phunics Woordspel",
-    "description": "Een leuk foniek-gebaseerd woordspel voor leerlingen.",
+    "title": "Phunics Word Game",
+    "description": "Een leuk foniek-gebaseerd woordspel om het leesniveau van kinderen te testen en verbeteren, gemaakt in samenwerking met het amerikaanse bedrijf Phunics. Aan het eind van het spel wordt op basis van de behaalde score een aanbeveling gegeven om de meest passende cursus te volgen.",
     "tags": ["education", "game", "phonics"],
     "year": 2023,
-    "status": "In Uitvoering",
-    "projectLink": "https://phunics.io",
-    "githubLink": "https://github.com/yourname/phunics",
-    "goal": "Maak het leren van foniek leuk en boeiend door middel van een interactief woordspel."
+    "status": "Afgerond",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Een game maken wat door het bedrijf gebruikt kan worden om het leesniveau van kinderen te testen, om ze de beste cursus aan te raden."
   },
   {
     "name": "recoilrampage",
     "title": "Recoil Rampage",
-    "description": "⚡ (Details nodig — genre, doel, en tech stack).",
-    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "description": "Een 2D roguelike shooter game waarbij jouw enige manier om te bewegen is door terugslag van je wapens te gebruiken. Ontwikkeld als een creatieve oefening in game design en ontwikkeling.",
+    "tags": ["unity", "c#", "game", "pixel-art", "aseprite"],
     "year": 2021,
-    "status": "In Uitvoering",
+    "status": "Concept",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Creëer een snel actie spel gefocust op terugslag mechanics, gecombineerd met pixel art, muziek, en boeiende gameplay."
+    "goal": ""
   }
 ]

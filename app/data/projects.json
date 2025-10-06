@@ -2,67 +2,67 @@
   {
     "name": "pijnwerk",
     "title": "Pijnwerk",
-    "description": "Website for a horse coaching company, including logo and web design. Goal is to create an informative website where people can learn about this new method of Horse Coaching and reach out to book sessions.",
+    "description": "Website for the horse coaching company Pijnwerk, including logo and web design.",
     "tags": ["website", "design", "branding", "next.js", "react", "ui/ux"],
     "year": 2025,
     "status": "In Progress",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Create an informative and visually appealing website where people can learn about Horse Coaching and easily reach out to book sessions."
+    "goal": "Create an informative and beautifully modern website where people can learn about this new method of horse coaching and easily get in touch to book sessions."
   },
   {
     "name": "habitica",
-    "title": "Habitica Quest Generator",
-    "description": "An extension for the productivity app Habitica, utilizing AI to turn your to-do list items into RPG-flavored quests.",
+    "title": "Quest Generator",
+    "description": "An extension for the productivity app Habitica that uses AI to transform your to-do list items into RPG-style quests.",
     "tags": ["javascript", "api", "ai", "prompt-engineering", "extension", "frontend"],
     "year": 2025,
     "status": "In Progress",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Enhance productivity by gamifying everyday to-do items and turning them into engaging RPG-style quests within Habitica."
+    "goal": "Enhance productivity by gamifying daily tasks and turning them into RPG-style quests within Habitica."
   },
   {
     "name": "truthfairies",
     "title": "Truthfairies INC",
-    "description": "Website built for a shamanic coaching company. Helped create a brand identity and developed a bold modern website from scratch to reach new customers.",
+    "description": "A website and brand identity for the shamanic coaching company Truth Fairies INC. I helped create the brand identity and coded a proof of concept for a modern, flashy website.",
     "tags": ["next.js", "javascript", "frontend", "branding", "website", "react", "ui/ux"],
     "year": 2025,
     "status": "In Progress",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Reach new customers by creating a bold, modern website with a strong brand identity."
+    "goal": "Build a sales funnel through a modern, eye-catching website that attracts new clients and encourages them to reach out for sessions."
   },
   {
     "name": "tapper",
     "title": "Coca Cola Tapper",
-    "description": "Hypothetical Coca-Cola branded rendition of the classic arcade game Tapper.",
+    "description": "A Coca-Cola branded version of the classic arcade game Tapper, created during my time at MBO Utrecht.",
     "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
     "year": 2021,
     "status": "Concept",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Reimagine the classic Tapper arcade game with Coca-Cola branding as a creative design and development exercise."
+    "goal": "Create a game for a fictional Coca-Cola advertising campaign."
   },
   {
     "name": "phunics",
     "title": "Phunics Word Game",
-    "description": "A fun phonics-based word game for learners.",
+    "description": "A fun phonics-based word game designed to test and improve children's reading skills, made in collaboration with the American company Phunics. At the end of the game, based on the score, players receive a recommendation for the most suitable course to follow.",
     "tags": ["education", "game", "phonics"],
     "year": 2023,
-    "status": "In Progress",
-    "projectLink": "https://phunics.io",
-    "githubLink": "https://github.com/yourname/phunics",
-    "goal": "Make learning phonics engaging and fun through an interactive word game."
+    "status": "Completed",
+    "projectLink": "",
+    "githubLink": "",
+    "goal": "Develop a game that the company can use to assess children's reading levels and recommend the best matching course."
   },
   {
     "name": "recoilrampage",
     "title": "Recoil Rampage",
-    "description": "⚡ (Need details here — genre, goal, and tech stack).",
-    "tags": ["unity", "c#", "game", "pixel-art", "music", "aseprite"],
+    "description": "A 2D roguelike shooter where your only way to move is by using your weapon’s recoil. Developed as a creative exercise in game design and development.",
+    "tags": ["unity", "c#", "game", "pixel-art", "aseprite"],
     "year": 2021,
-    "status": "In Progress",
+    "status": "Concept",
     "projectLink": "",
     "githubLink": "",
-    "goal": "Create a fast-paced action game focused on recoil mechanics, combining pixel art, music, and engaging gameplay."
+    "goal": ""
   }
 ]

@@ -12,40 +12,47 @@
     "title": "OVER",
     "experiences": [
       {
-        "title": "MBO Software Ontwikkelaar",
+        "title": "MBO-4 Software Ontwikkelaar",
         "company": "MBO Utrecht",
         "period": "Aug 2019 – Juni 2022",
         "location": "Utrecht, Nederland",
-        "description": "Voltooide een beroepsopleiding in Software Ontwikkeling, met een basis in front-end, PHP-gebaseerde back-end ontwikkeling en game development. Bouwde praktische projecten in web- en game-applicaties, samenwerkend in agile teamomgevingen en toepassend versiebeheer en moderne programmeerpraktijken."
+        "description": "Tijdens mijn MBO-4 opleiding Software Ontwikkeling heb ik een sterke technische basis opgebouwd in front-end, PHP-back-end en game development met Unity. Ik heb hier ook veel geleerd over essentiële programmeerconcepten zoals MVC, en het gebruik van versiebeheer met Git."
       },
       {
         "title": "Software Ontwikkeling Stagiair",
         "company": "AXiS Digitaal",
         "period": "Aug 2022 – Mei 2023",
         "location": "Nieuwegein, Nederland",
-        "description": "Werkte aan Unity game development met C# en WordPress-gebaseerde webprojecten. Assisteerde bij het beheren van partnerrelaties en voerde klantgesprekken om vereisten te verzamelen. Samenwerkte met het ontwikkelteam om praktische oplossingen te leveren en hands-on ervaring op te doen in zowel software als klantgerichte processen."
+        "description": "Werkte aan Unity-gameprojecten met C# en WordPress websites. Ondersteunde het beheer van partnerrelaties en voerde klantgesprekken om wensen en vereisten vast te leggen. Wat mij het meest is bijgebleven van deze stage is hoe leuk ik het vind om met klanten te praten en hun behoeften te vertalen naar werkende software."
       },
       {
         "title": "Junior Software Ontwikkelaar",
         "company": "AXiS Digitaal",
         "period": "Mei 2023 – Dec 2023",
         "location": "Nieuwegein, Nederland",
-        "description": "Ontwierp een website voor het gaming merk AXiS Gameforce en creëerde een GUI voor een data-invoer applicatie. Beheerde een team van stagiairs op WordPress projecten en nam meer verantwoordelijkheid in projectmanagement. Ontwikkelde een educatief webgebaseerd spel voor kinderen, werkend samen met internationale klanten om aan hun behoeften te voldoen."
+        "description": "Voor AXiS Gameforce ontwierp ik een website en ontwikkelde ik in Unity een GUI voor een data-invoerapplicatie. Daarnaast begeleidde ik een team van stagiairs bij WordPress-projecten en nam ik een grotere rol op me binnen projectmanagement. Ook werkte ik aan een educatief webspel voor kinderen, in samenwerking met het Amerikaanse bedrijf Phunics."
       },
       {
         "title": "AD Software Ontwikkelaar",
         "company": "Hogeschool Utrecht",
         "period": "Aug 2024 – Huidig",
         "location": "Amersfoort, Nederland",
-        "description": "Samenwerkte in een agile teamomgeving met medestudenten, ontwikkelend meerdere applicaties in Java en C#. Projecten omvatten een CLI applicatie voor het beheren van patiëntgegevens, een JavaFX openbaar vervoer app voor mensen met autisme, een C# openbaar vervoer dashboard voor een echte klant, en een flashcard spel voor het leren van programmeertermen. Kreeg hands-on ervaring in projectmanagement, teamwork en het leveren van functionele softwareoplossingen."
+        "description": "In teamverband werkte ik aan diverse softwareprojecten in Java en C#, binnen een agile leeromgeving. We ontwikkelden onder andere een CLI-tool voor patiëntbeheer, een JavaFX openbaar vervoer app voor mensen met autisme, een C# OV-dashboard voor een echte klant en een flashcardspel om programmeertermen te leren. Het leuke van mijn studie is dat er een goede band tussen studenten en docenten is, wat leidt tot lange en leerzame gesprekken over niet alleen softwareontwikkeling, maar ook juist een nadruk op UX en design."
+      },
+      {
+        "title": "Python Data Structures",
+        "company": "University of Michigan",
+        "period": "Februari 2020",
+        "location": "Online",
+        "description": "Een cursus die zich richt op het begrijpen en toepassen van datastructuren in Python."
       }
     ],
     "text": [
-      "Ik ben een gepassioneerde software ontwikkelaar met een solide basis in front-end, PHP-gebaseerde back-end ontwikkeling en game development. Gedurende mijn opleiding bij MBO Utrecht en praktische ervaringen bij AXiS Digitaal en Hogeschool Utrecht, heb ik praktische expertise opgedaan in het bouwen van web-, mobiele en desktop-applicaties met diverse technologieën, waaronder Java, C#, JavaFX, Unity, React Native en WordPress.",
-      "Ik gedij in collaboratieve, agile teamomgevingen, waar ik stagiairs heb geleid, direct met klanten heb gewerkt en heb bijgedragen aan real-world projecten variërend van educatieve spellen en openbaar vervoer applicaties tot dashboards en data management tools. Mijn werk combineert technische vaardigheden met creativiteit, een scherp oog voor gebruikerservaring en een focus op het leveren van praktische oplossingen die impact maken.",
-      "Gedreven door nieuwsgierigheid en continu leren, geniet ik van het aanpakken van complexe problemen, het verkennen van nieuwe technologieën en het creëren van software die zowel functioneel als boeiend is."
+      "Mijn interesse in het maken van software begon al op jonge leeftijd, toen ik experimenteerde met games maken in Scratch en later kleine projecten bouwde in Unity. Deze nieuwsgierigheid groeide al snel uit naar een echte passie voor het maken van digitale ervaringen die zowel functioneel als gebruiksvriendelijk zijn.",
+      "Wat ik het leukst vind aan softwareontwikkeling is niet alleen het oplossen van technische uitdagingen, maar ook het begrijpen van de behoeften van de mensen die de software gebruiken. Klanten hebben me vaak verteld dat ze waarderen hoe ik echt luister en hun wensen begrijp, iets waar ik veel waarde aan hecht in mijn werk.",
+      "Momenteel ben ik op zoek naar een stage als softwareontwikkelaar, ik ben op zoek naar een team waar ik mijn creativiteit kwijt kan, en mijn technische vaardigheden verder kan ontwikkelen. Het liefst werk ik mee aan innovatieve projecten die problemen op lossen waar nog geen oplossing voor is."
     ],
-    "downloadCV": "Download CV"
+    "downloadCV": "CV Downloaden"
   },
   "projects": {
     "title": "WERK",
