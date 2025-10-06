@@ -81,7 +81,14 @@ export default function ProjectDisplay({
       )}
 
       <div style={{ width: isMobile ? '100%' : '50%' }}>
-    <ProjectImageGrid images={images} hoverDirection={hoverDirection} onRevealComplete={() => setImagesDone(true)} animateReveal={animateReveal} disableInteractions={disableInteractions} />
+    <ProjectImageGrid 
+      images={images} 
+      githubUrl={project.githubLink || undefined} 
+      hoverDirection={hoverDirection} 
+      onRevealComplete={() => setImagesDone(true)} 
+      animateReveal={animateReveal} 
+      disableInteractions={disableInteractions} 
+    />
       </div>
       <div style={{ width: isMobile ? '100%' : '50%' }}>
   <ProjectInfoPanel 

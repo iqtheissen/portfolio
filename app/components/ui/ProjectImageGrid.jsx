@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import IconButton from './IconButton'; // Adjust path if necessary
 import TiltedCard from '@/app/blocks/Components/TiltedCard/TiltedCard';
 
-export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab.com/users/sign_in", hoverDirection = 'down', onRevealComplete, animateReveal = true, disableInteractions = false }) {
+export default function ProjectImageGrid({ images, githubUrl, hoverDirection = 'down', onRevealComplete, animateReveal = true, disableInteractions = false }) {
   const { main, small1, small2 } = images || {};
   const containerRef = useRef(null);
 
@@ -90,7 +90,7 @@ export default function ProjectImageGrid({ images, githubUrl = "https://app.ynab
         )}
 
         {/* GitHub IconButton */}
-        {githubUrl && (
+        {githubUrl && githubUrl.trim() !== '' && (
           <div
             style={{
               position: 'absolute',
