@@ -339,3 +339,27 @@ html, body, #__next, [data-scroll-container] {
             0%   { transform: translateX(0); opacity: 1; }
             100% { transform: translateX(100%); opacity: 0; }
           }
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar-track {
+  background-color: #000000;
+  border: 1px solid #cfcfcf;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 0;
+}
+
+/* Firefox scrollbar - only apply when webkit scrollbars aren't supported */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: #ffffff #000000;
+  }
+}
