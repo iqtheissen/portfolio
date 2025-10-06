@@ -11,6 +11,12 @@ uniform float uDisplace;
 uniform float uSpread;
 uniform float uNoise;
 
+uniform vec3 uOldColor1;
+uniform vec3 uOldColor2;
+uniform vec3 uNewColor1;
+uniform vec3 uNewColor2;
+uniform float uColorLerp;
+
 #define PI 3.14159265358979
 #define MOD3 vec3(.1031,.11369,.13787)
 
@@ -74,6 +80,12 @@ vec3 cyclePalette(float time) {
     return lerp(palette[index0], palette[index1], frac);
 }
 
+vec3 debugPalette() {
+    vec3 lerpedColor1 = mix(uOldColor1, uNewColor1, uColorLerp);
+    vec3 lerpedColor2 = mix(uOldColor2, uNewColor2, uColorLerp);
+    return lerpedColor1 / lerpedColor2;
+}
+
 void main() {
     initPalette();
 
@@ -85,7 +97,9 @@ void main() {
 
     vec3 cyclingColor = cyclePalette(uTime);
 
-    vec3 color = -vec3(pnoise(vec3(1. - newPosition.z * 35.)) * 40.) * (.01 - full) * cyclingColor;
+    vec3 debugColor = debugPalette();
+
+    vec3 color = -vec3(pnoise(vec3(1. - newPosition.z * 35.)) * 40.) * (.01 - full) * debugColor;
 
     gl_FragColor = vec4(color, 1.);
 }

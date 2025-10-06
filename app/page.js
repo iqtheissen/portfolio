@@ -58,15 +58,16 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading) {
-      // Add a small delay to ensure the fade out animation always plays
+      // Reduce delay on mobile for faster loading experience
+      const delay = isMobile ? 200 : 500;
       const timeout = setTimeout(() => {
         setShowLoading(false);
-      }, 500);
+      }, delay);
       return () => clearTimeout(timeout);
     } else {
       setShowLoading(true);
     }
-  }, [loading]);
+  }, [loading, isMobile]);
 
   // Lock scroll when loading or when mobile overlay is open
   useEffect(() => {
@@ -320,6 +321,7 @@ export default function Home() {
               progress={heroToProjectsProgress}
               activeSection={activeSection}
               isMobile={isMobile}
+              selectedProject={selectedProject}
             />
           </div>
         </div>

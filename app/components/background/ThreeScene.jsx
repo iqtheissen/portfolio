@@ -12,17 +12,54 @@ import fragmentShader from "../../shaders/fragment";
 import { horizontalBlurShader } from "../../shaders/horizontalBlurShader";
 import { verticalBlurShader } from "../../shaders/verticalBlurShader";
 
-export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMobile}) {
+export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMobile, selectedProject }) {
   const canvasRef = useRef(null);
   const mousePos = useRef(new THREE.Vector2(0.5, 0.5));
+  const guiRef = useRef(null);
+  const currentProjectRef = useRef(selectedProject);
+  const colorLerpRef = useRef({ startTime: 0, duration: 1000, isLerping: false });
+  const torusUniformsRef = useRef(null);
+  const hBlurPassRef = useRef(null);
+  const vBlurPassRef = useRef(null);
 
   const progressRef = useRef(progress);
 
 
   useEffect(() => {
-    // Update the progress reference whenever the progress changes, but only if the active section is not "projects"
     progressRef.current = activeSection !== "projects" ? progress : 1;
   }, [progress, activeSection]);
+
+  // Handle project color changes with smooth lerping
+  useEffect(() => {
+    if (!selectedProject || !currentProjectRef.current || !torusUniformsRef.current) return;
+
+    // If this is the first project or the project changed
+    if (currentProjectRef.current.name !== selectedProject.name) {
+      const uniforms = torusUniformsRef.current;
+
+      // Set old colors to current colors
+      const currentColor1 = uniforms.uDebugColor1.value;
+      const currentColor2 = uniforms.uDebugColor2.value;
+
+      uniforms.uOldColor1.value.copy(currentColor1);
+      uniforms.uOldColor2.value.copy(currentColor2);
+
+      // Set new colors from selected project
+      if (selectedProject.color1 && selectedProject.color2) {
+        uniforms.uNewColor1.value.set(...selectedProject.color1);
+        uniforms.uNewColor2.value.set(...selectedProject.color2);
+      }
+
+      // Start lerping
+      colorLerpRef.current = {
+        startTime: Date.now(),
+        duration: 1000, // 1 second lerp
+        isLerping: true
+      };
+
+      currentProjectRef.current = selectedProject;
+    }
+  }, [selectedProject]);
 
   useEffect(() => {
     let composer, torus;
@@ -52,9 +89,20 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
             uSpread: { value: .5 },
             uNoise: { value: 16 },
             uMouseDistance: { value: 0 },
+            uDebugColor1: { value: new THREE.Vector3(0.6, 0.3, 0.9) },
+            uDebugColor2: { value: new THREE.Vector3(0.5, 0.5, 0.05) },
+            uOldColor1: { value: new THREE.Vector3(0.6, 0.3, 0.9) },
+            uOldColor2: { value: new THREE.Vector3(0.5, 0.5, 0.05) },
+            uNewColor1: { value: new THREE.Vector3(0.6, 0.3, 0.9) },
+            uNewColor2: { value: new THREE.Vector3(0.5, 0.5, 0.05) },
+            uColorLerp: { value: 1.0 },
           },
         })
       );
+
+      // Store torus reference globally for color lerping
+      window.torus = torus;
+      torusUniformsRef.current = torus.material.uniforms;
 
       Main.scene.add(torus);
 
@@ -66,18 +114,26 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
       composer = new EffectComposer(Main.gl, renderTarget);
 
       composer.addPass(new RenderPass(Main.scene, Main.camera));
-      composer.addPass(
-        new UnrealBloomPass(new THREE.Vector2(1, 1), 1.2, 0.05, 0.07)
-      );
-      const hBlurPass = new ShaderPass(horizontalBlurShader);
-      const vBlurPass = new ShaderPass(verticalBlurShader);
+      
+      // Skip bloom and blur passes on mobile for faster loading
+      if (!isMobile) {
+        composer.addPass(
+          new UnrealBloomPass(new THREE.Vector2(1, 1), 1.2, 0.05, 0.07)
+        );
+        const hBlurPass = new ShaderPass(horizontalBlurShader);
+        const vBlurPass = new ShaderPass(verticalBlurShader);
 
-  // Set initial blur strength based on current resolution (use safe fallback)
-  hBlurPass.uniforms.h.value = 1.0 / Math.max(1, window.innerWidth);
-  vBlurPass.uniforms.v.value = 1.0 / Math.max(1, window.innerHeight);
+        // Set initial blur strength based on current resolution (use safe fallback)
+        hBlurPass.uniforms.h.value = 1.0 / Math.max(1, window.innerWidth);
+        vBlurPass.uniforms.v.value = 1.0 / Math.max(1, window.innerHeight);
 
-      composer.addPass(hBlurPass);
-      composer.addPass(vBlurPass);
+        composer.addPass(hBlurPass);
+        composer.addPass(vBlurPass);
+        
+        // Store references for animation updates
+        hBlurPassRef.current = hBlurPass;
+        vBlurPassRef.current = vBlurPass;
+      }
 
       composer.addPass(new SMAAPass(1, 1));
       composer.addPass(new ShaderPass(TransparentBackgroundShader));
@@ -155,6 +211,21 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
   torus.material.uniforms.uTime.value = t;
   torus.material.uniforms.uMouse.value.copy(mousePos.current);
 
+  // Handle color lerping
+  if (colorLerpRef.current.isLerping && torusUniformsRef.current) {
+    const elapsed = Date.now() - colorLerpRef.current.startTime;
+    const progress = Math.min(elapsed / colorLerpRef.current.duration, 1.0);
+    
+    torusUniformsRef.current.uColorLerp.value = progress;
+    
+    if (progress >= 1.0) {
+      colorLerpRef.current.isLerping = false;
+      // Update debug colors to new colors when lerping is complete
+      torusUniformsRef.current.uDebugColor1.value.copy(torusUniformsRef.current.uNewColor1.value);
+      torusUniformsRef.current.uDebugColor2.value.copy(torusUniformsRef.current.uNewColor2.value);
+    }
+  }
+
   if (
     !Number.isNaN(mousePos.current.x) &&
     !Number.isNaN(mousePos.current.y)
@@ -185,8 +256,12 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
   const blurStrength = progressRef.current * 3.0;
   const bufW = canvas ? (canvas.width || window.innerWidth) : window.innerWidth;
   const bufH = canvas ? (canvas.height || window.innerHeight) : window.innerHeight;
-  hBlurPass.uniforms.h.value = blurStrength / Math.max(1, bufW);
-  vBlurPass.uniforms.v.value = blurStrength / Math.max(1, bufH);
+  
+  // Only update blur passes if they exist (not on mobile)
+  if (hBlurPassRef.current && vBlurPassRef.current) {
+    hBlurPassRef.current.uniforms.h.value = blurStrength / Math.max(1, bufW);
+    vBlurPassRef.current.uniforms.v.value = blurStrength / Math.max(1, bufH);
+  }
 
   // --- Modify camera distance here ---         // Set this to your starting camera z-position
   const minDistance = 2;       // Closest camera distance
@@ -206,7 +281,9 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
 
   if (first) {
     first = false;
-    setTimeout(() => onLoaded?.(), 100);
+    // Reduce delay on mobile for faster loading
+    const delay = isMobile ? 50 : 100;
+    setTimeout(() => onLoaded?.(), delay);
   }
 };
       animate();
@@ -217,6 +294,10 @@ export default function ThreeScene({ onLoaded, progress = 0, activeSection, isMo
     return () => {
       resizeObserver?.disconnect();
       if (mouseMoveHandler) window.removeEventListener("mousemove", mouseMoveHandler);
+      if (guiRef.current) {
+        guiRef.current.destroy();
+        guiRef.current = null;
+      }
     };
   }, [onLoaded]);
 
