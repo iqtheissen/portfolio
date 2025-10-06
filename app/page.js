@@ -58,9 +58,10 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading) {
+      // Add a small delay to ensure the fade out animation always plays
       const timeout = setTimeout(() => {
         setShowLoading(false);
-      }, 1000);
+      }, 500);
       return () => clearTimeout(timeout);
     } else {
       setShowLoading(true);
@@ -205,7 +206,10 @@ export default function Home() {
             zIndex: 9999,
           }}
         >
-          <LoadingBar onComplete={() => { console.log('LoadingBar onComplete -> animationFinished = true'); setAnimationFinished(true); }} />
+          <LoadingBar 
+            onComplete={() => { console.log('LoadingBar onComplete -> animationFinished = true'); setAnimationFinished(true); }} 
+            assetsLoaded={assetsLoaded}
+          />
         </div>
       )}
 

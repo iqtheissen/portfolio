@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
 
-function LoadingBar({ onComplete }) {
+function LoadingBar({ onComplete, assetsLoaded = false }) {
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (assetsLoaded) {
+      // Complete immediately when assets are loaded
       if (typeof onComplete === 'function') {
-        onComplete(); // ✅ Notify parent after animation duration
+        onComplete();
       }
-    }, 2000); // ⏱ Match your CSS animation duration (3s)
-
-    return () => clearTimeout(timer); // Cleanup on unmount
-  }, [onComplete]);
+    }
+  }, [assetsLoaded, onComplete]);
 
   return (
     <div id='loader'>
@@ -19,7 +18,10 @@ function LoadingBar({ onComplete }) {
         <p className="loading-number">%</p>
       </div>
       <div id='loading-bar-border'>
-        <div className='loading-bar'></div>
+        <div 
+          className='loading-bar'
+          style={assetsLoaded ? { width: '100%', animation: 'none' } : {}}
+        ></div>
       </div>
       <div id='warning'>
         <div className='exclamation'>!</div>
