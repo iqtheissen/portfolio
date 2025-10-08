@@ -169,6 +169,7 @@ export default function AboutSection({ progress, isMobile}) {
 
         {/* Navigation buttons */}
         <button
+          className="cursor-target"
           onClick={prevCard}
           style={{
             position: 'absolute',
@@ -200,6 +201,7 @@ export default function AboutSection({ progress, isMobile}) {
           />
         </button>
         <button
+          className="cursor-target"
           onClick={nextCard}
           style={{
             position: 'absolute',
