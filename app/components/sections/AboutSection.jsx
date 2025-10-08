@@ -267,7 +267,7 @@ export default function AboutSection({ progress, isMobile}) {
 
         {/* Download CV: right-aligned under the About text */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: isMobile ? '4vh' : '1.5rem' }}>
-          <DownloadButton href="/cv.pdf" text={t('about.downloadCV')} />
+          <DownloadButton href={t('about.cvpath')} text={t('about.downloadCV')} />
         </div>
       </div>
     </section>

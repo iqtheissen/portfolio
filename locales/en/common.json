@@ -52,7 +52,8 @@
   "What I enjoy most about software development is not just solving technical challenges, but also understanding the needs of the people who use the software. Clients have often told me they appreciate how I truly listen and understand their requirements, something I value greatly in my work.",
   "I am currently looking for an internship as a software developer, in a team where I can apply my creativity and further develop my technical skills. Ideally, I want to contribute to innovative projects that solve problems where no solution currently exists."
   ],
-    "downloadCV": "Download CV"
+    "downloadCV": "Download CV",
+    "cvpath" : "/resume.pdf"
   },
   "projects": {
     "title": "WORK",

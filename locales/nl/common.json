@@ -52,7 +52,8 @@
       "Wat ik het leukst vind aan softwareontwikkeling is niet alleen het oplossen van technische uitdagingen, maar ook het begrijpen van de behoeften van de mensen die de software gebruiken. Klanten hebben me vaak verteld dat ze waarderen hoe ik echt luister en hun wensen begrijp, iets waar ik veel waarde aan hecht in mijn werk.",
       "Momenteel ben ik op zoek naar een stage als softwareontwikkelaar, ik ben op zoek naar een team waar ik mijn creativiteit kwijt kan, en mijn technische vaardigheden verder kan ontwikkelen. Het liefst werk ik mee aan innovatieve projecten die problemen op lossen waar nog geen oplossing voor is."
     ],
-    "downloadCV": "CV Downloaden"
+    "downloadCV": "CV Downloaden",
+    "cvpath" : "/cv.pdf"
   },
   "projects": {
     "title": "WERK",
