@@ -65,7 +65,7 @@ export default function ProjectImageGrid({ images, githubUrl, hoverDirection = '
           position: 'relative',
           width: '100%',
           aspectRatio: '16 / 9',
-          borderRadius: '8px',
+          // borderRadius: '8px',
           overflow: 'hidden',
           backgroundColor: '#333',
   opacity: 0,
@@ -125,7 +125,7 @@ export default function ProjectImageGrid({ images, githubUrl, hoverDirection = '
             style={{
               width: '100%',
               aspectRatio: '4 / 3',
-              borderRadius: '8px',
+              // borderRadius: '8px',
               overflow: 'hidden',
               backgroundColor: '#444',
               opacity: 0,
