@@ -118,9 +118,9 @@ export default function ProjectInfoPanel({
 
       {/* View Project Button */}
       {project.projectLink && (
-        <div data-reveal style={{ marginTop: '2rem' }}>
+        <div data-reveal style={{  }}>
           <CyberButton
-            href={project.projectLink}
+            onClick={() => window.open(project.projectLink, '_blank', 'noopener,noreferrer')}
             style={{
               padding: '1rem 2rem',
               fontSize: '1.2rem',
