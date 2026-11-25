@@ -4,6 +4,7 @@
 
 import { useRef, useEffect } from "react";
 import { Renderer, Program, Triangle, Mesh } from "ogl";
+import { createGraphicsLoop } from "../../../lib/graphicsLoop";
 
 const RippleGrid = ({
   enableRainbow = false,
@@ -24,9 +25,21 @@ const RippleGrid = ({
   const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
   const mouseInfluenceRef = useRef(0);
   const uniformsRef = useRef(null);
+  const loopRef = useRef(null);
+  const initialPropsRef = useRef({
+    enableRainbow, gridColor, rippleIntensity, gridSize, gridThickness,
+    fadeDistance, vignetteStrength, glowIntensity, opacity, gridRotation,
+    mouseInteraction, mouseInteractionRadius,
+  });
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const {
+      enableRainbow, gridColor, rippleIntensity, gridSize, gridThickness,
+      fadeDistance, vignetteStrength, glowIntensity, opacity, gridRotation,
+      mouseInteraction, mouseInteractionRadius,
+    } = initialPropsRef.current;
 
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -42,13 +55,14 @@ const RippleGrid = ({
     const renderer = new Renderer({
       dpr: Math.min(window.devicePixelRatio, 2),
       alpha: true,
+      depth: false,
     });
     const gl = renderer.gl;
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.canvas.style.width = "100%";
     gl.canvas.style.height = "100%";
-    containerRef.current.appendChild(gl.canvas);
+    container.appendChild(gl.canvas);
 
     const vert = `
 attribute vec2 position;
@@ -177,39 +191,42 @@ void main() {
     const mesh = new Mesh(gl, { geometry, program });
 
     const resize = () => {
-      const { clientWidth: w, clientHeight: h } = containerRef.current;
+      const { clientWidth: w, clientHeight: h } = container;
       renderer.setSize(w, h);
       uniforms.iResolution.value = [w, h];
+      loopRef.current?.invalidate();
     };
 
     const handleMouseMove = (e) => {
-      if (!mouseInteraction || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
+      if (!uniforms.mouseInteraction.value) return;
+      const rect = container.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1.0 - (e.clientY - rect.top) / rect.height; // Flip Y coordinate
       targetMouseRef.current = { x, y };
+      loopRef.current?.invalidate();
     };
 
     const handleMouseEnter = () => {
-      if (!mouseInteraction) return;
+      if (!uniforms.mouseInteraction.value) return;
       mouseInfluenceRef.current = 1.0;
+      loopRef.current?.invalidate();
     };
 
     const handleMouseLeave = () => {
-      if (!mouseInteraction) return;
+      if (!uniforms.mouseInteraction.value) return;
       mouseInfluenceRef.current = 0.0;
+      loopRef.current?.invalidate();
     };
 
-    window.addEventListener("resize", resize);
-    if (mouseInteraction) {
-      containerRef.current.addEventListener("mousemove", handleMouseMove);
-      containerRef.current.addEventListener("mouseenter", handleMouseEnter);
-      containerRef.current.addEventListener("mouseleave", handleMouseLeave);
-    }
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseenter", handleMouseEnter);
+    container.addEventListener("mouseleave", handleMouseLeave);
     resize();
 
-    const render = (t) => {
-      uniforms.iTime.value = t * 0.001;
+    const loop = createGraphicsLoop(container, (t, delta, reducedMotion) => {
+      uniforms.iTime.value = reducedMotion ? 0 : t * 0.001;
 
       const lerpFactor = 0.1;
       mousePositionRef.current.x +=
@@ -222,32 +239,25 @@ void main() {
       uniforms.mouseInfluence.value +=
         (targetInfluence - currentInfluence) * 0.05;
 
-      uniforms.mousePosition.value = [
-        mousePositionRef.current.x,
-        mousePositionRef.current.y,
-      ];
+      uniforms.mousePosition.value[0] = mousePositionRef.current.x;
+      uniforms.mousePosition.value[1] = mousePositionRef.current.y;
 
       renderer.render({ scene: mesh });
-      requestAnimationFrame(render);
-    };
-
-    requestAnimationFrame(render);
+    });
+    loopRef.current = loop;
 
     return () => {
-      window.removeEventListener("resize", resize);
-      if (mouseInteraction && containerRef.current) {
-        containerRef.current.removeEventListener("mousemove", handleMouseMove);
-        containerRef.current.removeEventListener(
-          "mouseenter",
-          handleMouseEnter
-        );
-        containerRef.current.removeEventListener(
-          "mouseleave",
-          handleMouseLeave
-        );
-      }
-      renderer.gl.getExtension("WEBGL_lose_context")?.loseContext();
-      containerRef.current?.removeChild(gl.canvas);
+      loop.destroy();
+      loopRef.current = null;
+      uniformsRef.current = null;
+      resizeObserver.disconnect();
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseenter", handleMouseEnter);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+      geometry.remove();
+      program.remove();
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      gl.canvas.remove();
     };
   }, []);
 
@@ -277,6 +287,7 @@ void main() {
     uniformsRef.current.gridRotation.value = gridRotation;
     uniformsRef.current.mouseInteraction.value = mouseInteraction;
     uniformsRef.current.mouseInteractionRadius.value = mouseInteractionRadius;
+    loopRef.current?.invalidate();
   }, [
     enableRainbow,
     gridColor,
