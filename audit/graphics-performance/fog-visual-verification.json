@@ -1,0 +1,1 @@
+[{"config":{"kind":"fog","width":720,"height":1440,"croppedHeight":540,"dpr":1,"scale":1},"maxChannelDifference":0,"meanChannelDifference":0,"passed":true},{"config":{"kind":"fog","width":390,"height":5000,"croppedHeight":1013,"dpr":3,"scale":4},"maxChannelDifference":0,"meanChannelDifference":0,"passed":true}]
