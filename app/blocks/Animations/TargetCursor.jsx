@@ -2,7 +2,8 @@
 	Installed from https://reactbits.dev/tailwind/
 */
 
-import { useEffect, useRef, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 
 const TargetCursor = ({
@@ -14,6 +15,7 @@ const TargetCursor = ({
    const cornersRef = useRef(null);
    const spinTl = useRef(null);
    const dotRef = useRef(null); 
+   const [portalHost, setPortalHost] = useState(null);
    const constants = useMemo(
     () => ({
       borderWidth: 6,
@@ -31,6 +33,16 @@ const TargetCursor = ({
       duration: 0.1,
       ease: "power3.out",
     });
+  }, []);
+
+  useEffect(() => {
+    // Keep one cursor mounted while its host moves into and out of modal dialogs.
+    const host = document.createElement("div");
+    host.style.display = "contents";
+    host.setAttribute("aria-hidden", "true");
+    document.body.append(host);
+    setPortalHost(host);
+    return () => host.remove();
   }, []);
 
   useEffect(() => {
@@ -296,10 +308,30 @@ const TargetCursor = ({
 
     window.addEventListener("mouseover", enterHandler, { passive: true });
 
+    const syncCursorLayer = () => {
+      const dialogs = document.querySelectorAll("dialog[open]");
+      const container = dialogs[dialogs.length - 1] || document.body;
+      if (portalHost.parentElement !== container) {
+        currentLeaveHandler?.();
+        container.append(portalHost);
+      }
+    };
+
+    syncCursorLayer();
+    const dialogObserver = new MutationObserver(syncCursorLayer);
+    dialogObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["open"],
+      subtree: true,
+    });
+
     return () => {
+      dialogObserver.disconnect();
       window.removeEventListener("mousemove", moveHandler);
       window.removeEventListener("mouseover", enterHandler);
       window.removeEventListener("scroll", scrollHandler);
+      window.removeEventListener("mousedown", mouseDownHandler);
+      window.removeEventListener("mouseup", mouseUpHandler);
 
       if (activeTarget) {
         cleanupTarget(activeTarget);
@@ -313,7 +345,7 @@ const TargetCursor = ({
 
       document.body.style.cursor = originalCursor;
     };
-  }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor]);
+  }, [portalHost, targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor]);
 
   // Recreate spin timeline if spinDuration changes
   useEffect(() => {
@@ -324,9 +356,9 @@ const TargetCursor = ({
         .timeline({ repeat: -1 })
         .to(cursorRef.current, { rotation: "+=360", duration: spinDuration, ease: "none" });
     }
-  }, [spinDuration]);
+  }, [spinDuration, portalHost]);
 
-  return (
+  return portalHost ? createPortal(
     <div
       ref={cursorRef}
       className="fixed top-0 left-0 w-0 h-0 pointer-events-none z-[9999] mix-blend-difference transform -translate-x-1/2 -translate-y-1/2"
@@ -353,8 +385,9 @@ const TargetCursor = ({
         className="target-cursor-corner absolute left-1/2 top-1/2 w-3 h-3 border-[2px] border-white transform -translate-x-[150%] translate-y-1/2 border-r-0 border-t-0"
         style={{ willChange: 'transform' }}
       />
-    </div>
-  );
+    </div>,
+    portalHost
+  ) : null;
 };
 
 export default TargetCursor;

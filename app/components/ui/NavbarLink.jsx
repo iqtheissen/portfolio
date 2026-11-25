@@ -3,7 +3,7 @@
 import React from "react";
 import { useDecryptAnimation } from "../../hooks/useDecryptAnimation";
 
-export default function NavbarLink({ href, originalText, decryptedText, locoScrollRef }) {
+export default function NavbarLink({ href, originalText, decryptedText, locoScrollRef, onClick, ...props }) {
   const { displayText, startAnimation, resetText } = useDecryptAnimation({
     originalText,
     decryptedText,
@@ -12,6 +12,10 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
 
   const handleClick = (e) => {
     e.preventDefault();
+    if (onClick) {
+      onClick(e);
+      return;
+    }
     if (locoScrollRef?.current) {
       // Lenis expects `duration` in seconds and `easing` as a function.
       // Convert previous easing to a reasonable easeOutCubic approximation.
@@ -26,9 +30,13 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
     }
   };
 
+  const Tag = onClick ? "button" : "a";
+
   return (
-    <a
-      href={href}
+    <Tag
+      {...props}
+      href={onClick ? undefined : href}
+      type={onClick ? "button" : undefined}
       onClick={handleClick}
       onMouseEnter={startAnimation}
       onMouseLeave={resetText}
@@ -43,9 +51,12 @@ export default function NavbarLink({ href, originalText, decryptedText, locoScro
         lineHeight: 1.2,
         whiteSpace: "nowrap",
         cursor: "pointer",
+        background: "none",
+        border: "none",
+        padding: 0,
       }}
     >
       {displayText}
-    </a>
+    </Tag>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
 import NavbarLink from "./NavbarLink";
 import MenuToggleButton from "./MenuToggleButton";
@@ -8,6 +8,7 @@ import IconButton from "./IconButton";
 import useSectionProgress from "../../hooks/useSectionProgress";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ContactModal from "./ContactModal";
 
 export default function Navbar({
   locoScrollRef,
@@ -19,6 +20,9 @@ export default function Navbar({
   const [borderWidth, setBorderWidth] = useState("0%");
   const [transitionSpeed, setTransitionSpeed] = useState("1.5s");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isContactVisible, setIsContactVisible] = useState(false);
+  const menuToggleRef = useRef(null);
   const [atTop, setAtTop] = useState(true);
   const normalTransitionSpeed = "0.7s";
   const { t, i18n } = useTranslation();
@@ -119,6 +123,12 @@ export default function Navbar({
     };
   }, [isMenuOpen, isMobile, isMobileOverlayOpen]);
 
+  useEffect(() => {
+    if (isMobile) return;
+    setIsMenuOpen(false);
+    setOverlayVisible(false);
+  }, [isMobile]);
+
   // Keep the initial slow transition, then switch to normal speed after a
   // short delay (matches previous behaviour).
   useEffect(() => {
@@ -134,17 +144,35 @@ export default function Navbar({
 
   // Combined toggle button handler:
   const handleToggleClick = () => {
-    if (isMobileOverlayOpen) {
+    if (isContactVisible) {
+      setIsContactOpen(false);
+    } else if (isMobileOverlayOpen) {
       setIsMobileOverlayOpen(false);
     } else {
       toggleMenu();
     }
   };
 
+  const openContact = () => {
+    setIsMenuOpen(false);
+    setIsContactVisible(true);
+    setIsContactOpen(true);
+  };
+
+  const closeContact = useCallback(() => {
+    setIsContactOpen(false);
+  }, []);
+
+  const finishContactClose = useCallback(() => {
+    setIsContactOpen(false);
+    setIsContactVisible(false);
+    if (isMobile) requestAnimationFrame(() => menuToggleRef.current?.focus({ preventScroll: true }));
+  }, [isMobile]);
+
   // Lock body scroll (and pause lenis/loco if available) while mobile menu is open.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const open = isMenuOpen || isMobileOverlayOpen;
+    const open = isMenuOpen || overlayVisible || isMobileOverlayOpen || isContactVisible;
 
     // store original overflow the first time we open
     if (open) {
@@ -174,15 +202,17 @@ export default function Navbar({
       // ensure we restore on unmount
       if (document?.body) document.body.style.overflow = originalBodyOverflow.current || '';
     };
-  }, [isMenuOpen, isMobileOverlayOpen, locoScrollRef]);
+  }, [isMenuOpen, overlayVisible, isMobileOverlayOpen, isContactVisible, isLocoReady, locoScrollRef]);
 
   // The toggle button is considered "open" if either menu OR overlay is open
-  const isToggleOpen = isMenuOpen || isMobileOverlayOpen;
+  const isToggleOpen = isMenuOpen || overlayVisible || isMobileOverlayOpen || isContactVisible;
+  const isNavigationVisible = isMobile && (isMenuOpen || overlayVisible);
 
   return (
     <>
       {/* Navbar */}
       <nav
+        inert={isContactVisible && !isNavigationVisible}
         style={{
           position: "fixed",
           top: 0,
@@ -196,7 +226,7 @@ export default function Navbar({
           justifyContent: isMobile ? "space-between" : "flex-end",
           padding: isMobile ? "0 1.5rem" : `2rem ${atTop ? "18rem" : "12.5rem"}`,
           transition: `padding ${transitionSpeed} ease`,
-          zIndex: 1000,
+          zIndex: isContactVisible && !isNavigationVisible ? 997 : 1000,
         }}
       >
         
@@ -230,7 +260,9 @@ export default function Navbar({
 
             <NavbarLink
               key={`nav-contact-${i18n.language}`}
-              href="#contact"
+              onClick={openContact}
+              aria-haspopup="dialog"
+              aria-controls="contact-modal"
               originalText={t("nav.contact")}
               decryptedText={t("nav.contact").toUpperCase()}
               locoScrollRef={locoScrollRef}
@@ -242,8 +274,8 @@ export default function Navbar({
 
         {/* Mobile Menu Button */}
         {isMobile && (
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <MenuToggleButton isOpen={isToggleOpen} onClick={handleToggleClick} />
+          <div style={{ position: "relative", zIndex: 2, visibility: isContactVisible && !isNavigationVisible ? "hidden" : "visible" }}>
+            <MenuToggleButton buttonRef={menuToggleRef} isOpen={isToggleOpen} onClick={handleToggleClick} />
           </div>
         )}
 
@@ -362,21 +394,10 @@ export default function Navbar({
 
           <button
             className="mobile-nav-item"
-            onClick={(e) => {
-              e.preventDefault();
-              if (locoScrollRef?.current) {
-                if (typeof locoScrollRef.current.start === 'function') locoScrollRef.current.start();
-                else if (typeof locoScrollRef.current.resume === 'function') locoScrollRef.current.resume();
-                const lenisDuration = 1.3;
-                const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-                locoScrollRef.current.scrollTo('#contact', {
-                  offset: 0,
-                  duration: 0,
-                  easing: easeOutCubic,
-                });
-              }
-                toggleMenu();
-              }}
+            type="button"
+            onClick={openContact}
+            aria-haspopup="dialog"
+            aria-controls="contact-modal"
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -416,6 +437,14 @@ export default function Navbar({
           </div>
         </div>
       )}
+      <ContactModal
+        isOpen={isContactOpen}
+        isVisible={isContactVisible}
+        isNavigationVisible={isNavigationVisible}
+        onClose={closeContact}
+        onAfterClose={finishContactClose}
+        isMobile={isMobile}
+      />
     </>
   );
 }

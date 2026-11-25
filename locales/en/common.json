@@ -1,5 +1,10 @@
 {
   "nav": { "contact": "contact", "projects": "projects", "about": "about" },
+  "contact": {
+    "email": "Email",
+    "phone": "Phone",
+    "close": "Close contact"
+  },
   "hero": {
     "hi": "Hi I'm",
     "firstName": "Quint",

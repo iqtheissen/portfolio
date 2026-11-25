@@ -1,0 +1,129 @@
+.modal {
+  position: fixed;
+  z-index: 998;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 5rem 1rem 2rem;
+  border: 0;
+  background: transparent;
+  color: white;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.modal[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 80%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+}
+
+.modal[data-custom-cursor="true"],
+.modal[data-custom-cursor="true"] * {
+  cursor: none !important;
+}
+
+.content {
+  width: min(28rem, calc(100vw - 5rem));
+  font-family: 'Anaheim', sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+.row {
+  padding: 1rem 0;
+  border-top: 1px solid rgb(255 255 255 / 25%);
+}
+
+.row:last-child {
+  padding-bottom: 0;
+}
+
+.row dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: rgb(255 255 255 / 70%);
+  font-size: 1rem;
+}
+
+.row a {
+  display: inline-block;
+  padding: 0.25rem 0;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 35%);
+  text-underline-offset: 0.25em;
+}
+
+.row a:hover,
+.close:hover {
+  color: #f54b5c;
+}
+
+.row a:focus-visible,
+.close:focus-visible,
+.mobileToggle button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
+}
+
+.mobileToggle {
+  position: fixed;
+  top: 0;
+  right: 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
+@media (max-height: 480px) {
+  .modal[open] {
+    align-items: flex-start;
+  }
+}
