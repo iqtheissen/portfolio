@@ -1,0 +1,1731 @@
+{
+  "date": "2026-11-25",
+  "gitBranch": "chore_optimization",
+  "machine": {
+    "gpuInstalled": "NVIDIA GeForce RTX 3060",
+    "gpuDriver": "610.88",
+    "browser": "Brave",
+    "webglRendererReported": "Brave (privacy masked)",
+    "threeRevision": 177,
+    "vantaVersion": "0.5.24"
+  },
+  "methodology": {
+    "type": "Isolated copies of the application shaders, torus construction, post-processing chain, and installed Vanta FOG effect",
+    "warmupFrames": 60,
+    "samplesPerRound": 180,
+    "roundsPerScenario": 2,
+    "roundOrder": "Forward then reverse",
+    "gpuTimer": "EXT_disjoint_timer_query_webgl2; disjoint results discarded",
+    "presentation": "Final pass redirected to equivalent-size offscreen target with matching reported MSAA count to reduce browser swapchain waits; compositor/presentation excluded",
+    "cpu": "Time spent submitting render commands, excluding warmup, React, interactions and library RAF overhead",
+    "desktopScenario": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "torusCSS": [
+        576,
+        576
+      ],
+      "fogPageHeight": 2880,
+      "dprCases": [
+        1,
+        2
+      ]
+    },
+    "phoneScenario": {
+      "viewport": [
+        390,
+        844
+      ],
+      "torusCSS": [
+        590,
+        590
+      ],
+      "fogPageHeight": 5000,
+      "dpr": 3
+    }
+  },
+  "limitations": [
+    "No physical low-end phone or older laptop was tested. Phone cases only simulate buffer dimensions on this desktop GPU.",
+    "Does not measure electrical watts, battery drain, whole-page CPU use or combined scene frame rate.",
+    "Phone intended-mobile-pipeline cases also reproduce the existing mobile camera distance of 20 instead of the captured desktop distance 2.6, so their visual output differs.",
+    "Optimized torus cases skip the two custom blur passes only in the hero state where blur strength is zero; active section blur must remain available.",
+    "Fog viewport-height case omits the current parallax overscan; retaining the parallax needs approximately 20% extra height or another framing solution.",
+    "Shader geometry variants require visual validation before production use.",
+    "GPU timestamps include scheduling variability; median ranges are from the two independent rounds, with p95 values retained in raw results.",
+    "Onscreen test runs showed presentation-related timing stalls, so those timings are not used as rendering-cost estimates."
+  ],
+  "summaries": [
+    {
+      "name": "torus-desktop-dpr1-current",
+      "gpuMedianMsRange": [
+        0.53248,
+        0.556032
+      ],
+      "cpuMeanMsRange": [
+        0.2927777785393927,
+        0.31444444441133074
+      ],
+      "drawCalls": 20,
+      "canvas": [
+        576,
+        576
+      ],
+      "composer": [
+        576,
+        576
+      ],
+      "triangles": 500000
+    },
+    {
+      "name": "torus-desktop-dpr2-current",
+      "gpuMedianMsRange": [
+        1.652544,
+        1.83808
+      ],
+      "cpuMeanMsRange": [
+        0.29333333157830765,
+        0.3061111104157236
+      ],
+      "drawCalls": 20,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        1728,
+        1728
+      ],
+      "triangles": 500000
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr",
+      "gpuMedianMsRange": [
+        0.91648,
+        1.282048
+      ],
+      "cpuMeanMsRange": [
+        0.2972222218910853,
+        0.30888888753122756
+      ],
+      "drawCalls": 20,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "triangles": 500000
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-lower-mesh",
+      "gpuMedianMsRange": [
+        0.83456,
+        0.908288
+      ],
+      "cpuMeanMsRange": [
+        0.2955555558204651,
+        0.3155555579397413
+      ],
+      "drawCalls": 20,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "triangles": 36864
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-mesh-skip-zero-blur",
+      "gpuMedianMsRange": [
+        0.627712,
+        0.774144
+      ],
+      "cpuMeanMsRange": [
+        0.29277777787711884,
+        0.3011111098859045
+      ],
+      "drawCalls": 18,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "triangles": 36864
+    },
+    {
+      "name": "fog-desktop-dpr1-page-height",
+      "gpuMedianMsRange": [
+        0.641024,
+        0.782336
+      ],
+      "cpuMeanMsRange": [
+        0.09888889011409548,
+        0.11500000026490953
+      ],
+      "drawCalls": 1,
+      "canvas": [
+        720,
+        1440
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr2-page-height",
+      "gpuMedianMsRange": [
+        1.908736,
+        1.921792
+      ],
+      "cpuMeanMsRange": [
+        0.10388888981607225,
+        0.10611111041572359
+      ],
+      "drawCalls": 1,
+      "canvas": [
+        1440,
+        2880
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr2-viewport-height",
+      "gpuMedianMsRange": [
+        0.723968,
+        0.728064
+      ],
+      "cpuMeanMsRange": [
+        0.08277777830759685,
+        0.10611111058129205
+      ],
+      "drawCalls": 1,
+      "canvas": [
+        1440,
+        900
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "torus-phone-current-stale-desktop-pipeline",
+      "gpuMedianMsRange": [
+        1.200128,
+        1.471488
+      ],
+      "cpuMeanMsRange": [
+        0.29277777953280343,
+        0.3111111102832688
+      ],
+      "drawCalls": 20,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "triangles": 500000
+    },
+    {
+      "name": "torus-phone-intended-mobile-pipeline",
+      "gpuMedianMsRange": [
+        0.67584,
+        0.678912
+      ],
+      "cpuMeanMsRange": [
+        0.1511111103826099,
+        0.16055555476082695
+      ],
+      "drawCalls": 5,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "triangles": 500000
+    },
+    {
+      "name": "torus-phone-fix-dpr-mesh-and-pipeline",
+      "gpuMedianMsRange": [
+        0.239616,
+        0.243712
+      ],
+      "cpuMeanMsRange": [
+        0.1599999999006589,
+        0.16277777949968975
+      ],
+      "drawCalls": 5,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        590,
+        590
+      ],
+      "triangles": 9216
+    },
+    {
+      "name": "fog-phone-page-height-modeled-5000px",
+      "gpuMedianMsRange": [
+        0.556032,
+        0.91648
+      ],
+      "cpuMeanMsRange": [
+        0.07111111217074924,
+        0.07722222093078825
+      ],
+      "drawCalls": 1,
+      "canvas": [
+        292,
+        3750
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "fog-phone-viewport-height",
+      "gpuMedianMsRange": [
+        0.210944,
+        0.280576
+      ],
+      "cpuMeanMsRange": [
+        0.07166666719648573,
+        0.07611111005147299
+      ],
+      "drawCalls": 1,
+      "canvas": [
+        292,
+        633
+      ],
+      "triangles": 2
+    }
+  ],
+  "results": [
+    {
+      "name": "torus-desktop-dpr1-current",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 1,
+        "name": "torus-desktop-dpr1-current"
+      },
+      "setupMs": 93.7000000178814,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        576,
+        576
+      ],
+      "composer": [
+        576,
+        576
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        576,
+        576
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.30000001192092896,
+        "p95": 0.5,
+        "mean": 0.31444444441133074
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.53248,
+        "p95": 0.556032,
+        "mean": 0.6459733333333342
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000000546,
+        "p95": 7.100000000000364,
+        "mean": 6.944692737430165
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-desktop-dpr2-current",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "name": "torus-desktop-dpr2-current"
+      },
+      "setupMs": 60.29999998211861,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        1728,
+        1728
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.29333333157830765
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.83808,
+        "p95": 7.006208,
+        "mean": 3.0041936000000002
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000000546,
+        "p95": 7.100000000000364,
+        "mean": 6.945251396648044
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "name": "torus-desktop-dpr2-fix-dpr"
+      },
+      "setupMs": 51.5,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.2972222218910853
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.91648,
+        "p95": 0.97792,
+        "mean": 1.1732421333333323
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 7,
+        "p95": 7.100000000000364,
+        "mean": 6.945251396648044
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-lower-mesh",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "radial": 96,
+        "tubular": 192,
+        "name": "torus-desktop-dpr2-fix-dpr-lower-mesh"
+      },
+      "setupMs": 14.800000011920929,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 18721,
+      "triangles": 36864,
+      "geometryBytes": 820256,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.2955555558204651
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.83456,
+        "p95": 6.069248,
+        "mean": 1.3552298666666671
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.199999999998909,
+        "mean": 6.945251396648039
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 36883
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-mesh-skip-zero-blur",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "radial": 96,
+        "tubular": 192,
+        "skipZeroBlur": true,
+        "name": "torus-desktop-dpr2-fix-dpr-mesh-skip-zero-blur"
+      },
+      "setupMs": 14.200000017881393,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 18721,
+      "triangles": 36864,
+      "geometryBytes": 820256,
+      "configuredPasses": 4,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.29277777787711884
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.774144,
+        "p95": 5.174272,
+        "mean": 1.091117511111112
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 7,
+        "p95": 7.100000000000364,
+        "mean": 6.943575418994421
+      },
+      "drawCalls": 18,
+      "submittedTriangles": 36881
+    },
+    {
+      "name": "fog-desktop-dpr1-page-height",
+      "round": 0,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 2880,
+        "dpr": 1,
+        "scale": 2,
+        "name": "fog-desktop-dpr1-page-height"
+      },
+      "setupMs": 16.099999994039536,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        720,
+        1440
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 2880,
+      "actualCanvasAfterWarmup": [
+        720,
+        1440
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.20000001788139343,
+        "mean": 0.11500000026490953
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.782336,
+        "p95": 2.804736,
+        "mean": 1.5709639111111136
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 7,
+        "p95": 7.100000000000364,
+        "mean": 6.9446927374301595
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr2-page-height",
+      "round": 0,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 2880,
+        "dpr": 2,
+        "scale": 2,
+        "name": "fog-desktop-dpr2-page-height"
+      },
+      "setupMs": 18.299999982118607,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        1440,
+        2880
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 2880,
+      "actualCanvasAfterWarmup": [
+        1440,
+        2880
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.20000001788139343,
+        "mean": 0.10611111041572359
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.908736,
+        "p95": 4.959232,
+        "mean": 2.525770844444444
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 7,
+        "p95": 7.100000000000364,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr2-viewport-height",
+      "round": 0,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 900,
+        "dpr": 2,
+        "scale": 2,
+        "name": "fog-desktop-dpr2-viewport-height"
+      },
+      "setupMs": 14.5,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        1440,
+        900
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 900,
+      "actualCanvasAfterWarmup": [
+        1440,
+        900
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104,
+        "mean": 0.08277777830759685
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.723968,
+        "p95": 0.81408,
+        "mean": 0.7362332444444456
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "torus-phone-current-stale-desktop-pipeline",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "name": "torus-phone-current-stale-desktop-pipeline"
+      },
+      "setupMs": 70.69999998807907,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.30000001192092896,
+        "p95": 0.5,
+        "mean": 0.3111111102832688
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.200128,
+        "p95": 6.3744,
+        "mean": 1.6689152000000007
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.9446927374301595
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-phone-intended-mobile-pipeline",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "mobilePipeline": true,
+        "name": "torus-phone-intended-mobile-pipeline"
+      },
+      "setupMs": 59.69999998807907,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 3,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.19999998807907104,
+        "p95": 0.30000001192092896,
+        "mean": 0.16055555476082695
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.67584,
+        "p95": 0.723968,
+        "mean": 0.7383893333333328
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 5,
+      "submittedTriangles": 500004
+    },
+    {
+      "name": "torus-phone-fix-dpr-mesh-and-pipeline",
+      "round": 0,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "mobilePipeline": true,
+        "fixDpr": true,
+        "radial": 48,
+        "tubular": 96,
+        "name": "torus-phone-fix-dpr-mesh-and-pipeline"
+      },
+      "setupMs": 11.700000017881393,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        590,
+        590
+      ],
+      "vertices": 4753,
+      "triangles": 9216,
+      "geometryBytes": 207392,
+      "configuredPasses": 3,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.19999998807907104,
+        "p95": 0.29999998211860657,
+        "mean": 0.16277777949968975
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.243712,
+        "p95": 0.259072,
+        "mean": 0.3571655111111117
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 5,
+      "submittedTriangles": 9220
+    },
+    {
+      "name": "fog-phone-page-height-modeled-5000px",
+      "round": 0,
+      "config": {
+        "kind": "fog",
+        "width": 390,
+        "height": 5000,
+        "dpr": 3,
+        "scale": 4,
+        "name": "fog-phone-page-height-modeled-5000px"
+      },
+      "setupMs": 16.100000023841858,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        292,
+        3750
+      ],
+      "triangles": 2,
+      "scale": 4,
+      "modeledPageHeight": 5000,
+      "actualCanvasAfterWarmup": [
+        292,
+        3750
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104,
+        "mean": 0.07722222093078825
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.556032,
+        "p95": 3.152896,
+        "mean": 0.8470636444444426
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.943575418994421
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-phone-viewport-height",
+      "round": 0,
+      "config": {
+        "kind": "fog",
+        "width": 390,
+        "height": 844,
+        "dpr": 3,
+        "scale": 4,
+        "name": "fog-phone-viewport-height"
+      },
+      "setupMs": 14,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        292,
+        633
+      ],
+      "triangles": 2,
+      "scale": 4,
+      "modeledPageHeight": 844,
+      "actualCanvasAfterWarmup": [
+        292,
+        633
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104,
+        "mean": 0.07611111005147299
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.210944,
+        "p95": 0.234496,
+        "mean": 0.21420977777777775
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-phone-viewport-height",
+      "round": 1,
+      "config": {
+        "kind": "fog",
+        "width": 390,
+        "height": 844,
+        "dpr": 3,
+        "scale": 4,
+        "name": "fog-phone-viewport-height"
+      },
+      "setupMs": 12.900000005960464,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        292,
+        633
+      ],
+      "triangles": 2,
+      "scale": 4,
+      "modeledPageHeight": 844,
+      "actualCanvasAfterWarmup": [
+        292,
+        633
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104,
+        "mean": 0.07166666719648573
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.280576,
+        "p95": 0.342016,
+        "mean": 0.2850702222222223
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.945810055865918
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-phone-page-height-modeled-5000px",
+      "round": 1,
+      "config": {
+        "kind": "fog",
+        "width": 390,
+        "height": 5000,
+        "dpr": 3,
+        "scale": 4,
+        "name": "fog-phone-page-height-modeled-5000px"
+      },
+      "setupMs": 15.300000011920929,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        292,
+        3750
+      ],
+      "triangles": 2,
+      "scale": 4,
+      "modeledPageHeight": 5000,
+      "actualCanvasAfterWarmup": [
+        292,
+        3750
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.19999998807907104,
+        "mean": 0.07111111217074924
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.91648,
+        "p95": 0.9728,
+        "mean": 0.97875057777778
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "torus-phone-fix-dpr-mesh-and-pipeline",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "mobilePipeline": true,
+        "fixDpr": true,
+        "radial": 48,
+        "tubular": 96,
+        "name": "torus-phone-fix-dpr-mesh-and-pipeline"
+      },
+      "setupMs": 15.699999988079071,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        590,
+        590
+      ],
+      "vertices": 4753,
+      "triangles": 9216,
+      "geometryBytes": 207392,
+      "configuredPasses": 3,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.19999998807907104,
+        "p95": 0.30000001192092896,
+        "mean": 0.1599999999006589
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.239616,
+        "p95": 0.26112,
+        "mean": 0.3241927111111113
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000002183,
+        "mean": 6.9446927374301595
+      },
+      "drawCalls": 5,
+      "submittedTriangles": 9220
+    },
+    {
+      "name": "torus-phone-intended-mobile-pipeline",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "mobilePipeline": true,
+        "name": "torus-phone-intended-mobile-pipeline"
+      },
+      "setupMs": 56.099999994039536,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 3,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.10000002384185791,
+        "p95": 0.30000001192092896,
+        "mean": 0.1511111103826099
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.678912,
+        "p95": 0.684032,
+        "mean": 0.7790364444444425
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.099999999998545,
+        "mean": 6.943575418994401
+      },
+      "drawCalls": 5,
+      "submittedTriangles": 500004
+    },
+    {
+      "name": "torus-phone-current-stale-desktop-pipeline",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 590,
+        "dpr": 3,
+        "mobileViewport": true,
+        "name": "torus-phone-current-stale-desktop-pipeline"
+      },
+      "setupMs": 49.599999994039536,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        590,
+        590
+      ],
+      "composer": [
+        1180,
+        1180
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        590,
+        590
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.29277777953280343
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.471488,
+        "p95": 6.334464,
+        "mean": 2.127200711111111
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "fog-desktop-dpr2-viewport-height",
+      "round": 1,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 900,
+        "dpr": 2,
+        "scale": 2,
+        "name": "fog-desktop-dpr2-viewport-height"
+      },
+      "setupMs": 15,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        1440,
+        900
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 900,
+      "actualCanvasAfterWarmup": [
+        1440,
+        900
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.20000001788139343,
+        "mean": 0.10611111058129205
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.728064,
+        "p95": 1.205248,
+        "mean": 0.8956794666666658
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.943575418994421
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr2-page-height",
+      "round": 1,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 2880,
+        "dpr": 2,
+        "scale": 2,
+        "name": "fog-desktop-dpr2-page-height"
+      },
+      "setupMs": 18.400000005960464,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        1440,
+        2880
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 2880,
+      "actualCanvasAfterWarmup": [
+        1440,
+        2880
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.20000001788139343,
+        "mean": 0.10388888981607225
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.921792,
+        "p95": 2.72784,
+        "mean": 2.202637333333334
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.099999999998545,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "fog-desktop-dpr1-page-height",
+      "round": 1,
+      "config": {
+        "kind": "fog",
+        "width": 1440,
+        "height": 2880,
+        "dpr": 1,
+        "scale": 2,
+        "name": "fog-desktop-dpr1-page-height"
+      },
+      "setupMs": 15.600000023841858,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        720,
+        1440
+      ],
+      "triangles": 2,
+      "scale": 2,
+      "modeledPageHeight": 2880,
+      "actualCanvasAfterWarmup": [
+        720,
+        1440
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.09999999403953552,
+        "p95": 0.20000001788139343,
+        "mean": 0.09888889011409548
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.641024,
+        "p95": 0.720896,
+        "mean": 0.621573155555555
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 7,
+        "p95": 7.100000000005821,
+        "mean": 6.943575418994421
+      },
+      "drawCalls": 1,
+      "submittedTriangles": 2
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-mesh-skip-zero-blur",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "radial": 96,
+        "tubular": 192,
+        "skipZeroBlur": true,
+        "name": "torus-desktop-dpr2-fix-dpr-mesh-skip-zero-blur"
+      },
+      "setupMs": 21.5,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 18721,
+      "triangles": 36864,
+      "geometryBytes": 820256,
+      "configuredPasses": 4,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.3011111098859045
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.627712,
+        "p95": 5.23776,
+        "mean": 0.9613198222222228
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 18,
+      "submittedTriangles": 36881
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr-lower-mesh",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "radial": 96,
+        "tubular": 192,
+        "name": "torus-desktop-dpr2-fix-dpr-lower-mesh"
+      },
+      "setupMs": 17.100000023841858,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 18721,
+      "triangles": 36864,
+      "geometryBytes": 820256,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.30000001192092896,
+        "p95": 0.5,
+        "mean": 0.3155555579397413
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.908288,
+        "p95": 0.963584,
+        "mean": 1.1570574222222223
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.9446927374301595
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 36883
+    },
+    {
+      "name": "torus-desktop-dpr2-fix-dpr",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "fixDpr": true,
+        "name": "torus-desktop-dpr2-fix-dpr"
+      },
+      "setupMs": 59.099999994039536,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        864,
+        864
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.30888888753122756
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.282048,
+        "p95": 6.500352,
+        "mean": 2.062296177777779
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.099999999998545,
+        "mean": 6.943016759776553
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-desktop-dpr2-current",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 2,
+        "name": "torus-desktop-dpr2-current"
+      },
+      "setupMs": 83.30000001192093,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        864,
+        864
+      ],
+      "composer": [
+        1728,
+        1728
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        864,
+        864
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.3061111104157236
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 1.652544,
+        "p95": 6.862848,
+        "mean": 2.4098512000000003
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.9446927374302
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    },
+    {
+      "name": "torus-desktop-dpr1-current",
+      "round": 1,
+      "config": {
+        "kind": "torus",
+        "size": 576,
+        "dpr": 1,
+        "name": "torus-desktop-dpr1-current"
+      },
+      "setupMs": 53.099999994039536,
+      "gpu": "Brave",
+      "timerSupported": true,
+      "disjoint": false,
+      "canvas": [
+        576,
+        576
+      ],
+      "composer": [
+        576,
+        576
+      ],
+      "vertices": 251001,
+      "triangles": 500000,
+      "geometryBytes": 14032032,
+      "configuredPasses": 6,
+      "actualCanvasAfterWarmup": [
+        576,
+        576
+      ],
+      "measurement": "offscreen-render-work-excludes-browser-presentation",
+      "presentationSamples": 4,
+      "cpuSubmissionMs": {
+        "count": 180,
+        "median": 0.29999998211860657,
+        "p95": 0.5,
+        "mean": 0.2927777785393927
+      },
+      "gpuMs": {
+        "count": 180,
+        "median": 0.556032,
+        "p95": 0.62464,
+        "mean": 0.7929432888888895
+      },
+      "frameIntervalMs": {
+        "count": 179,
+        "median": 6.900000000001455,
+        "p95": 7.100000000005821,
+        "mean": 6.944134078212291
+      },
+      "drawCalls": 20,
+      "submittedTriangles": 500019
+    }
+  ],
+  "analyticalFindings": {
+    "currentTorusGeometry": {
+      "radialSegments": 500,
+      "tubularSegments": 500,
+      "vertices": 251001,
+      "triangles": 500000,
+      "attributeAndIndexBytes": 14032032
+    },
+    "candidateDesktopGeometry": {
+      "radialSegments": 96,
+      "tubularSegments": 192,
+      "vertices": 18721,
+      "triangles": 36864,
+      "attributeAndIndexBytes": 820256,
+      "triangleReductionPercent": 92.6272
+    },
+    "candidateMobileGeometry": {
+      "radialSegments": 48,
+      "tubularSegments": 96,
+      "vertices": 4753,
+      "triangles": 9216,
+      "attributeAndIndexBytes": 207392,
+      "triangleReductionPercent": 98.1568
+    },
+    "desktopDpr2": {
+      "cssCanvasSide": 576,
+      "intendedBufferSide": 864,
+      "actualComposerSide": 1728,
+      "excessComposerPixelFactor": 4,
+      "estimatedOffscreenColorMiB": 89.21173095703125,
+      "correctedOffscreenColorMiB": 22.302932739257812,
+      "memoryEstimateExcludes": "Depth attachments, geometry, default framebuffer, browser and driver overhead"
+    },
+    "mobileQuality": {
+      "source": "app/components/background/ThreeScene.jsx:302; app/hooks/useMediaQuery.js:4",
+      "issue": "Scene initialization captures initial isMobile=false; the effect depends only on onLoaded. Runtime resolution uses matchMedia, but the post-processing chain and camera retain the captured flag."
+    },
+    "lifecycle": {
+      "sources": [
+        "app/components/background/ThreeScene.jsx:208",
+        "app/components/background/ThreeScene.jsx:294",
+        "app/init/init.js:347",
+        "app/blocks/Backgrounds/RippleGrid/RippleGrid.jsx:230"
+      ],
+      "issue": "Torus RAF, geometries, materials, composer/passes, renderer and controls are not cleaned up; the init resize listener is anonymous. RippleGrid loses the context on cleanup but does not cancel its RAF."
+    },
+    "fog": {
+      "source": "app/components/background/VantaFog.jsx:145",
+      "issue": "A fixed canvas is given page-content height plus 20% viewport height. Default fog scales are 2 desktop and 4 mobile, but device DPR is still multiplied in by Vanta.",
+      "typicalDesktopCanvasHeightInViewports": 3.2,
+      "parallaxOverscanForPreservedMotionInViewports": 1.2,
+      "viewportOnlyBenchmarkReductionPercent": 68.75,
+      "overscanPreservingPixelReductionPercent": 62.5
+    }
+  },
+  "rerun": {
+    "command": "node audit/graphics-performance/serve.cjs",
+    "url": "http://localhost:3000",
+    "action": "Use Run graphics comparison in a foreground browser window; close other GPU-heavy workloads for cleaner results.",
+    "generatedRawResults": "audit/graphics-performance/results.ndjson"
+  }
+}
